@@ -1,15 +1,12 @@
 use 5.010;
 use strict;
 my @d = <STDIN>;
-my $offset = 0;
 my $max = 400;
 my @map;
 my $id='1';
 foreach (@d) {
     chomp;
     my ($b,$a) = split(/, /);
-    $a+=$offset;
-    $b+=$offset;
     foreach my $x (0 .. $max) {
         foreach my $y (0..$max) {
             my $dist = abs($a - $x) + abs($b - $y);
@@ -36,8 +33,6 @@ foreach (@d) {
 }
 
 my %count;
-
-
 foreach my $x (0 .. $max) {
     foreach my $y (0..$max) {
         my $id = $map[$x][$y][0];
@@ -55,5 +50,4 @@ foreach my $val (values %count) {
 }
 
 say $hit;
-
 
