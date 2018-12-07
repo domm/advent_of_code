@@ -1,45 +1,31 @@
 use 5.026;
-use List::Util qw(uniqstr);
 use strict;
-my $steps={};
-my $prereq={};
-my %start = map {$_=>1} 'A' .. 'Z';
+
+my %prereq;
 while (<>) {
     my ($before, $after) = $_ =~/ ([A-Z]) .* ([A-Z])/;
-    push($steps->{$before}->@*, $after);
-    push($prereq->{$after}->@*,$before);
-    delete $start{$after};
+    $prereq{$before} ||= '';
+    $prereq{$after}.=$before;
 }
 
-my ($order) = sort keys %start;
-delete $start{$order};
+my $order;
 while (1) {
-    doit( uniqstr sort keys %start, map { $steps->{$_}->@* } keys %start );
-}
+    # get the first sorted step that has no prereq left (i.e. all steps that have to be done before this step are done)
+    my ($step) = sort grep { $prereq{$_} eq '' } keys %prereq;
 
-sub doit {
-    my @cands = uniqstr sort @_;
-    unless (@cands) {
+    # store the step in the solution
+    $order.=$step;
+
+    # delete this step from the list of steps
+    delete $prereq{$step};
+
+    # go through all available prereqs and remove this step, as it is done now
+    map { s/$step//; } values %prereq;
+
+    # stop when we have now steps left to do
+    unless (%prereq) {
         say $order;
-        exit;
-    }
-    say "cands: ".join(', ' ,@cands);
-    for (my $i=0;$i<@cands;$i++) {
-        my $cand = $cands[$i];
-        next if $order =~ /$cand/;
-        my $prereq = $prereq->{$cand} || [];
-        say "candidate: $cand requires " . join('+',@$prereq);
-        my $prehit=0;
-        foreach my $pr (@$prereq) {
-            $prehit++ if $order =~ /$pr/;
-        }
-        if ($prehit == scalar @$prereq) {
-            $order.=splice(@cands,$i,1);
-            say "winner is $cand";
-            push(@cands, $steps->{$cand}->@*) if $steps->{$cand};
-            doit(@cands);
-        }
-
+        last;
     }
 }
 
