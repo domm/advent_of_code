@@ -4,7 +4,7 @@ use warnings;
 use List::Util qw(max);
 
 my ($players, $last ) = @ARGV;
-my %score  = map { $_ => 0 } 0 .. $players - 1;
+my %score;
 
 my $head = {
     marble=>0,
