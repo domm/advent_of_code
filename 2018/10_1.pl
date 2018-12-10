@@ -24,11 +24,10 @@ foreach my $in (@input) {
     push($sky[$in->[0]+$offset][$in->[1]+$offset]->@*,[ $in->[2], $in->[3]]);
 }
 
-for (1..4) {
-    show();
+for (1..10) {
+    scan();
     tick();
     print `clear`;
-    sleep(1);
 
 }
 sub tick {
@@ -57,6 +56,24 @@ sub show {
             }
         }
         print "\n";
+    }
+}
+
+sub scan {
+    for my $i (1..$max) {
+        for my $j (1..$max) {
+            my $p = $sky[$i][$j];
+            if ($p) {
+                my $hit=0;
+                for my $look (1 .. 7) {
+                    $hit++ if $sky[$i+$look][$j];
+                }
+                if ($hit == 7) {
+                    show();
+                    exit;
+                }
+            }
+        }
     }
 }
 
