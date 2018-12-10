@@ -2,78 +2,73 @@ use 5.026;
 use strict;
 use warnings;
 my @sky;
-my $minx=0;
-my $miny=0;
-my $maxx;
-my $maxy;
-my @input;
+use List::Util qw/max min/;
 
 while (<>) {
-    my($y,$x,$my,$mx) = $_ =~ /position=<\s*([-\d]+),\s*([-\d]+)> velocity=<\s*([-\d]+),\s*([-\d]+)>/;
-    $minx = $x if $x < $minx;
-    $miny = $y if $y < $miny;
-    $maxx = $x if $x > $maxx;
-    $maxy = $y if $y > $maxy;
-    push(@input,[$x,$y,$mx,$my]);
-}
-my $offset = 1+ (-1* ($minx < $miny ? $minx : $miny));
-my $max = $offset + ($maxx > $maxy ? $maxx : $maxy);
-
-
-foreach my $in (@input) {
-    push($sky[$in->[0]+$offset][$in->[1]+$offset]->@*,[ $in->[2], $in->[3]]);
+    my($y,$x,$vx,$vy) = $_ =~ /position=<\s*([-\d]+),\s*([-\d]+)> velocity=<\s*([-\d]+),\s*([-\d]+)>/;
+    push(@sky,[$x,$y,$vy,$vx]);
 }
 
-for (1..10) {
-    scan();
-    tick();
-    print `clear`;
-
+my $sx = 10000000;
+my $sy = 10000000;
+my $smallest = 100000000;
+while (1) {
+    show();
+    move();
 }
-sub tick {
-    my @new;
-    for my $i (1..$max) {
-        for my $j (1..$max) {
-            my $loc = $sky[$i][$j];
-            next unless $loc;
-            foreach my $p ($loc->@*) {
-                push($new[$i + $p->[0]][$j + $p->[1]]->@*,$p);
-            }
-        }
+
+my $count=0;
+sub move {
+    foreach (@sky) {
+        $_->[0]+=$_->[2];
+        $_->[1]+=$_->[3];
     }
-    @sky = @new;
+    $count++;
 }
 
 sub show {
-    for my $i (1..$max) {
-        for my $j (1..$max) {
-            my $p = $sky[$i][$j];
-            if ($p) {
-                print "#";
-            }
-            else {
-                print ".";
-            }
-        }
-        print "\n";
+    my @map;
+    my (@x, @y);
+    my %positions = ();
+    foreach (@sky) {
+        push(@x,$_->[0]);
+        push(@y,$_->[1]);
+        $positions{$_->[0] . " " . $_->[1]} = 1;
     }
+
+    my $minx = min(@x);
+    my $maxx = max(@x);
+    my $miny = min(@y);
+    my $maxy = max(@y);
+    my $size = $maxx - $minx;
+    if ($size < $smallest) {
+        $smallest = $size;
+    }
+
+    if ($size < 10) {
+        for my $x ($minx .. $maxx) {
+            for my $y  ($miny .. $maxy) {
+                print $positions{$x . " " . $y} ? '#' : ' ';
+            }
+            print "\n";
+        }
+        say $count;
+       exit; 
+    }
+
+    #say "$minx $maxx - $miny $maxy";
+
+    #    for my $x ($minx..$maxx) {
+    #    for my $y ($miny..$maxy) {
+    #        print $positions{$x . " " . $y} ? '#' : '.';
+    #    }
+    #    say "";
+
+    #}
+
 }
 
-sub scan {
-    for my $i (1..$max) {
-        for my $j (1..$max) {
-            my $p = $sky[$i][$j];
-            if ($p) {
-                my $hit=0;
-                for my $look (1 .. 7) {
-                    $hit++ if $sky[$i+$look][$j];
-                }
-                if ($hit == 7) {
-                    show();
-                    exit;
-                }
-            }
-        }
-    }
+sub draw {
+    
 }
 
