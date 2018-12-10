@@ -2,73 +2,60 @@ use 5.026;
 use strict;
 use warnings;
 my @sky;
-use List::Util qw/max min/;
+my $smallest = 1000000;
+my $prev=$smallest + 1;
+my $count=0;
 
 while (<>) {
     my($y,$x,$vx,$vy) = $_ =~ /position=<\s*([-\d]+),\s*([-\d]+)> velocity=<\s*([-\d]+),\s*([-\d]+)>/;
     push(@sky,[$x,$y,$vy,$vx]);
 }
 
-my $sx = 10000000;
-my $sy = 10000000;
-my $smallest = 100000000;
 while (1) {
-    show();
-    move();
-}
-
-my $count=0;
-sub move {
+    # move
     foreach (@sky) {
         $_->[0]+=$_->[2];
         $_->[1]+=$_->[3];
     }
-    $count++;
-}
 
-sub show {
+    # check
     my @map;
-    my (@x, @y);
-    my %positions = ();
+    my ($max, $min)=(0,0);
     foreach (@sky) {
-        push(@x,$_->[0]);
-        push(@y,$_->[1]);
-        $positions{$_->[0] . " " . $_->[1]} = 1;
+        $max = $_->[0] if $_->[0] > $max;
+        $min = $_->[0] if $_->[0] < $min;
     }
-
-    my $minx = min(@x);
-    my $maxx = max(@x);
-    my $miny = min(@y);
-    my $maxy = max(@y);
-    my $size = $maxx - $minx;
+    my $size = $max - $min;
     if ($size < $smallest) {
-        $smallest = $size;
+        $smallest = $prev = $size;
     }
 
-    if ($size < 10) {
-        for my $x ($minx .. $maxx) {
-            for my $y  ($miny .. $maxy) {
-                print $positions{$x . " " . $y} ? '#' : ' ';
+    # found it!
+    if ($size > $prev) {
+
+        # revert time!
+        foreach (@sky) {
+            $_->[0]-=$_->[2];
+            $_->[1]-=$_->[3];
+        }
+
+        my @word;
+        my @box=(1000,0,1000,0);
+        foreach (@sky) {
+            $word[$_->[0]][$_->[1]]="#";
+            $box[0] = $_->[0] if $_->[0] < $box[0];
+            $box[1] = $_->[0] if $_->[0] > $box[1];
+            $box[2] = $_->[1] if $_->[1] < $box[2];
+            $box[3] = $_->[1] if $_->[1] > $box[3];
+        }
+        foreach my $x ($box[0] .. $box[1]) {
+            foreach my $y ($box[2] .. $box[3]) {
+                print $word[$x][$y] || ' ';
             }
             print "\n";
         }
-        say $count;
-       exit; 
+        say "waiting for $count seconds";
+        exit;
     }
-
-    #say "$minx $maxx - $miny $maxy";
-
-    #    for my $x ($minx..$maxx) {
-    #    for my $y ($miny..$maxy) {
-    #        print $positions{$x . " " . $y} ? '#' : '.';
-    #    }
-    #    say "";
-
-    #}
-
+    $count++;
 }
-
-sub draw {
-    
-}
-
