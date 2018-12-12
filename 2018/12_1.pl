@@ -25,8 +25,10 @@ foreach (<>) {
 }
 
 my $pots = \%pots;
-for (1 .. 20 ) {
+my $i=0;
+for (1 .. $gen ) {
     $pots = grow($pots);
+    say $i if $i++ % 100_000 == 0;
 }
 
 my $sum=0;
@@ -45,6 +47,7 @@ sub grow {
     my $max = max(keys %$old) +2;
     foreach my $potnr ($min .. $max) {
         my $neig = join('', map { $old->{$_} || '.' } ($potnr-2) .. ($potnr+2));
+        next if $neig eq '.....';
         my $hit=0;
         foreach my $m (sort keys %rules) {
             if ($neig eq $m) {
@@ -59,10 +62,10 @@ sub grow {
         }
     }
 
-    #foreach my $i (sort { $a <=> $b }  keys %next) {
-    #    print $next{$i} if $next{$i} ;
-    #}
-    #print"\n";
+    # foreach my $i (sort { $a <=> $b }  keys %next) {
+    #     print $next{$i} if $next{$i} ;
+    # }
+    # print"\n";
 
     return \%next;
 }
