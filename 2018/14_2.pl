@@ -3,10 +3,12 @@ use warnings;
 use 5.026;
 
 my $target = shift(@ARGV);
+chomp($target);
 
 my @r = qw(3 7);
 my @elfs = qw(0 1);
-my $num_rec_after_target = 10;
+my $find_l = -1 * (length($target) + 2);
+my ($last) = $target =~/(\d)$/;
 
 while (1) {
     my $sum = 0;
@@ -19,10 +21,12 @@ while (1) {
     for (my $i=0;$i<@elfs;$i++) {
         $elfs[$i] = ( $elfs[$i] + $r[$elfs[$i]] + 1) % @r;
     }
-    if (@r >= $target + $num_rec_after_target) {
-        say "stop";
-        say join('',splice(@r,$target,$num_rec_after_target));
-        exit;
+
+    if ($dig[-1] == $last) {
+        my $str = join('',@r[$find_l .. -1]);
+        if ($str =~ /$target/) {
+            say scalar @r + $find_l + 1;
+            exit;
+        }
     }
 }
-
