@@ -5,16 +5,16 @@ use 5.028;
 my $in = join('',<>);
 chomp($in);
 $in=~s/[\$\^]//;
-say $in;
 
-my $longest;
-my %branches=(1_1=>[0,0]);
+# remove circles
+while ($in =~/\([^(]+\|\)/) {
+    $in=~s/\([^(]+\|\)//g;
+}
+
+my %branches=(1=>[0,0]);
 my $branch=1;
-
-my $seen;
 my $max=0;
 foreach my $l (split(//,$in)) {
-    $seen.=$l;
     if ($l=~/[NSEW]/) {
         $branches{$branch}->[0]++;
     }
@@ -42,5 +42,4 @@ foreach my $l (split(//,$in)) {
     }
     $max = $branches{$branch}[0] if $max < $branches{$branch}[0];
 }
-
 say $max;
