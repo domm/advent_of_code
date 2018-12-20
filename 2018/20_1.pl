@@ -3,8 +3,6 @@ use warnings;
 use 5.028;
 
 my $in = join('',<>);
-chomp($in);
-$in=~s/[\$\^]//;
 
 # remove circles
 while ($in =~/\([^(]+\|\)/) {
