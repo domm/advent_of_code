@@ -3,7 +3,7 @@ use warnings;
 use 5.030;
 
 my @map = map { chomp; [split(//,$_)] } <STDIN>;
-my $w = scalar $map[0]->@*;
+my $w = $map[0]->@*;
 
 my $trees;
 my $c=0;

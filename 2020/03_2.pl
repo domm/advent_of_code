@@ -3,7 +3,7 @@ use warnings;
 use 5.030;
 
 my @map = map { chomp; [split(//,$_)] } <STDIN>;
-my $w = scalar $map[0]->@*;
+my $w = $map[0]->@*;
 
 my @slopes=([1,1],[3,1],[5,1],[7,1],[1,2]);
 
