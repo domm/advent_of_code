@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.030;
 
-my @map = map { chomp; my @row = split(//,$_); \@row } <STDIN>;
+my @map = map { chomp; [split(//,$_)] } <STDIN>;
 my $w = scalar $map[0]->@*;
 
 my @slopes=([1,1],[3,1],[5,1],[7,1],[1,2]);
