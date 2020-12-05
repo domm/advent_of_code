@@ -9,42 +9,9 @@ while (<STDIN>) {
     my @s = split //;
     my @r = splice(@s,0,7);
 
-    my @row = (0 .. 127);
+    my $lr=1;my $tr=128;my $row;
     for (my $i=0;$i<=6;$i++) {
-        my $range = int(@row/2);
-        #say $range;
-        if ($r[$i] eq 'F') {
-            @row = splice(@row,0,$range);
-        }
-        else {
-            @row = splice(@row,$range, $range);
-        }
-    }
-    my $row = $row[0];
-
-    my @seats = (0 .. 7);
-    for (my $i=0;$i<=2;$i++) {
-        my $range = int(@seats/2);
-        say $range;
-        if ($s[$i] eq 'L') {
-            @seats = splice(@seats,0,$range);
-        }
-        else {
-            @seats = splice(@seats,$range, $range);
-        }
-
-    }
-    my $seat = $seats[0];
-    my $id = $row * 8 + $seat;
-
-    say "$row / $seat -> $id";
-
-    $max=$id if $id > $max;
-}
-
-say "MAX $max";
-
-__END__
+        my $range = int(($tr - $lr) / 2);
         # say "$lr, $tr, ".$r[$i].", $range";
         if ($range == 1) {
             $row = $r[$i] eq 'F' ? $lr : $tr;
@@ -81,6 +48,7 @@ __END__
     }
     say "$seat";
 
+my $id = $row * 8 + $seat;
 say $id;
 
     say "\n";
