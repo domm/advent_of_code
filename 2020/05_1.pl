@@ -27,7 +27,32 @@ while (<STDIN>) {
         #say " -> $lr, $tr";
     }
 
-     say "$row \n\n";
+     say "$row";
+
+    my $ls=0;my $ts=7;my $seat;
+    for (my $i=0;$i<=2;$i++) {
+        my $range = int(($ts - $ls) / 2);
+         say "$ls, $ts, ".$s[$i].", $range";
+        if ($range == 1) {
+            $seat = $s[$i] eq 'L' ? $ls : $ts;
+        }
+        if ($s[$i] eq 'L') {
+            $ls = $ls;
+            $ts = $ls + $range;
+        }
+        else {
+            $ls += $range;
+            $ts = $ts;
+        }
+        say " -> $ls, $ts";
+    }
+    say "$seat";
+
+my $id = $row * 8 + $seat;
+say $id;
+
+    say "\n";
+    exit;
 }
 
 sub find_row {
