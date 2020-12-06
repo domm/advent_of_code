@@ -6,27 +6,22 @@ my $count;
 my %gq;
 my $members=0;
 while (<>) {
-    chomp();
-    my @q = split //;
-    if (@q == 0) {
+    chomp;
+    if (!$_) {
         count_group();
-        %gq=();
-        $members=0;
     }
     else {
         $members++;
-        for (@q) {
-            $gq{$_}++;
-        }
+        map { $gq{$_}++ } split //;
     }
 }
 
-count_group();
-
-say $count;
+say count_group();
 
 sub count_group {
     my @all_yes = grep { $gq{$_} == $members } keys %gq;
+    %gq=();
+    $members=0;
     $count += @all_yes;
 }
 
