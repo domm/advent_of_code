@@ -15,5 +15,4 @@ while (<>) {
     }
 }
 $count += keys %gq;
-
 say $count;
