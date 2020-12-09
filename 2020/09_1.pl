@@ -11,7 +11,7 @@ while (1) {
 say $in[$size];
 
 sub check {
-    my %lu = map { $_,1 } @in[0 .. $size-1];
+    my %lu     = map { $_, 1 } @in[ 0 .. $size - 1 ];
     my $target = $in[$size];
     for my $a ( keys %lu ) {
         if ( $lu{ $target - $a } ) {

@@ -2,58 +2,42 @@ use strict;
 use warnings;
 use 5.030;
 
-use List::Util qw (min max);
+use List::Util qw (min max sum);
 
-my $preamble=shift;
-my @in=map {chomp;$_} <>;
+my $size = shift;
+my @in   = map { chomp; $_ } <>;
+my @in2  = @in;
 
-my $target = find_target(@in);
-say $target;
+while (1) {
+    check() ? shift @in : last;
+}
+my $target = $in[$size];
 
-for (my $i=0;$i<@in;$i++) {
-    my @try = @in;
+while (1) {
+    my @try = @in2;
     my @cand;
-    #    while ($check <= $target) {
-    while (@cand < @try) {
-        push(@cand,shift(@try));
-        my $sum = 0;
-        map { $sum+=$_} @cand;
 
-        if ($sum == $target) {
-            my $min = min(@cand);
-            my $max = max(@cand);
-            say "$min + $max = ".($min+$max);
+    while (1) {
+        push( @cand, shift @try );
+        my $sum = sum(@cand);
+
+        if ( $sum == $target ) {
+            say min(@cand) + max(@cand);
             exit;
         }
         last if $sum > $target;
     }
-    shift(@in);
-}
-
-
-sub find_target {
-    my (@find) = @_;
-    while (1) {
-        if (check(@find)) {
-            shift @find;
-        }
-        else {
-            say "found ".$find[$preamble ];
-            return $find[$preamble];
-        }
-    }
+    shift(@in2);
 }
 
 sub check {
-    my @data = @_;
-    my %pre = map {$_,1} splice(@data, 0, $preamble);
-
-    my $target = $data[0];
-    for my $a (keys %pre) {
-        if ($pre{$target - $a}) {
+    my %lu     = map { $_, 1 } @in[ 0 .. $size - 1 ];
+    my $target = $in[$size];
+    for my $a ( keys %lu ) {
+        if ( $lu{ $target - $a } ) {
             return 1;
         }
     }
-    return 0
+    return;
 }
 
