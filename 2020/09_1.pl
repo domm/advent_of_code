@@ -2,17 +2,14 @@ use strict;
 use warnings;
 use 5.030;
 
-
-use List::Permutor;
-
 my $preamble=shift;
 say $preamble;
-my @in=<>;
+my @in=map {chomp;$_} <>;
 #use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@in;
 
 my $cnt=0;
 while (1) {
-    say $cnt++;
+    say "rount ".$cnt++;
     if (check(@in)) {
         shift @in;
     }
@@ -24,15 +21,14 @@ while (1) {
 
 sub check {
     my @data = @_;
-    my @pre = splice(@data, 0, $preamble);
-    my $perm = new List::Permutor @pre;
-    while (my ($a, $b) = $perm->next) {
-        my $sum = $a+$b;
-            say "$a + $b = $sum";
-        if ($data[0] == $sum) {
-            say "$a + $b = $sum";
+    my %pre = map {$_,1} splice(@data, 0, $preamble);
+
+    my $target = $data[0];
+    for my $a (keys %pre) {
+        if ($pre{$target - $a}) {
             return 1;
         }
     }
+    return 0
 }
 
