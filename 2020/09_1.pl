@@ -3,7 +3,6 @@ use warnings;
 use 5.030;
 
 my $preamble=shift;
-say $preamble;
 my @in=map {chomp;$_} <>;
 #use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@in;
 
