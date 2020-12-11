@@ -54,22 +54,4 @@ sub look {
     }
     return $count;
 }
-sub look2 {
-    my ( $map, $r, $c ) = @_;
-    my $count = 0;
-    foreach my $vec (@around) {
-        my $tr = $r;
-        my $tc = $c;
-        while (1) {
-            my $m = $tr + $vec->[0];
-            my $n = $tc + $vec->[1];
-            last if $m < 0 || $n < 0 || $m >= $h || $n >= $w;
-            my $val = $map[$m][$n];
-            $count++ if $val eq '#';
-            last unless $val eq '.';
-            $tr = $m;
-            $tc = $n;
-        }
-    }
-    return $count;
-}
+
