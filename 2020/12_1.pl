@@ -4,8 +4,8 @@ use 5.030;
 no strict 'refs';
 
 my @in = map { [/^(\w)(\d+)$/] }  <>;
-my @turn=qw(N E S W);
-my $dir = 1;
+my @dir=qw(N E S W);
+my $cur = 1;
 my $r=0;
 my $c=0;
 
@@ -19,6 +19,6 @@ sub N { $r -= shift }
 sub S { $r += shift }
 sub E { $c += shift }
 sub W { $c -= shift }
-sub F { $turn[$dir]->( shift ) }
-sub L { $dir = ($dir - $_[0] / 90) % 4 }
-sub R { $dir = ($dir + $_[0] / 90) % 4 }
+sub F { $dir[$cur]->( shift ) }
+sub L { $cur = ($cur - $_[0] / 90) % 4 }
+sub R { $cur = ($cur + $_[0] / 90) % 4 }
