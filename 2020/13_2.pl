@@ -7,13 +7,11 @@ my $ts = shift;
 my $ignore = <>;
 my @buses = split(',',<>);
 my @b;
-my $factor = 1;
 for(my $i=0;$i<@buses;$i++) {
     my $b =  $buses[$i];
     chomp($b);
     next if $b eq 'x';
     push(@b,[$b,$i]);
-    $factor *= $b;
 }
 my @sorted = sort { $b->[0] <=> $a->[0] } @b;
 
@@ -26,7 +24,6 @@ while (1) {
     $ts++;
 }
 say "START WITH $ts";
-say $factor;
 my $counter = ($sorted[0][0])**4;
 
 CHECKTS: while (1) {
@@ -41,7 +38,7 @@ CHECKTS: while (1) {
         if (int($check) == $check) {
             $hits++;
         } else {
-            $ts += $factor;
+            $ts += $sorted[0][0];
             next CHECKTS;
         }
     }
