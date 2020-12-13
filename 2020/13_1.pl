@@ -4,26 +4,17 @@ use 5.030;
 no strict 'refs';
 
 my $ts = <>;
-my @bus = split(',',<>);
-
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper {
-ts =>$ts,
-bus =>\@bus
-};
+my @buses = grep { /[\d+]/ } split(',',<>);
 
 my $choose='x';
-my $wait=10000000;
-foreach my $b (@bus) {
-    next if $b eq 'x';
-    my $f = int($ts / $b);
-    my $next = $b * ($f + 1);
-    if ($next < $wait) {
-        say "$b : $next";
-        $wait = $next;
-        $choose = $b;
+my $depart=10000000;
+foreach my $bus (@buses) {
+    my $check = $bus * (int($ts/$bus) + 1);
+    if ($check < $depart) {
+        $depart = $check;
+        $choose = $bus;
     }
 }
 
-say "$choose at $wait";
-say (($wait-$ts) * $choose);
+say "$choose at $depart: ".(($depart-$ts) * $choose);
 
