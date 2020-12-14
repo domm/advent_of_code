@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use 5.030;
-no strict 'refs';
 
 my %mem;
 my @mask;
