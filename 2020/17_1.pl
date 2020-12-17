@@ -14,6 +14,8 @@ for (my $y=0;$y<@map;$y++) {
     }
 }
 
+#show(\%map);
+
 my @moves;
 for my $mz ((-1,0,1)) {
     for my $my ((-1,0,1)) {
@@ -23,9 +25,16 @@ for my $mz ((-1,0,1)) {
     }
 }
 my $active=0;
-for (1..1) {
+for (1..6) {
     my %new;
     $active=0;
+    for my $pos (keys %map) {
+        my ($z,$y,$x) = split(/:/,$pos);
+        for my $m (@moves) {
+            my $init = join(':',$z+$m->[0],$y+$m->[1],$x+$m->[2]);
+            $map{$init}||='.';
+        }
+    }
     while (my ($pos,$val) = each %map) {
         my ($z,$y,$x) = split(/:/,$pos);
         my $count=0;
@@ -43,8 +52,28 @@ for (1..1) {
         $active++ if $new{$pos} eq '#';
     }
     %map = %{clone(\%new)};
-    use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%map;
 
+    # show(\%map);
 }
 
 say $active;
+
+sub show {
+    my $map = shift;
+    my$cz=9999999999;my $cy=99999999999;
+    for my $p (sort keys %$map) {
+        my ($z,$y,$x) = split(/:/,$p);
+        my $v = $map->{$p};
+        if ($z != $cz) {
+            print "\n\nZ $z\n";
+            $cz=$z;
+        }
+        if ($y != $cy) {
+            print"\n";
+            $cy=$y;
+        }
+        print $v;
+    }
+    print "\n\n";
+}
+
