@@ -34,38 +34,31 @@ for(split(/\n\n/,join('',<>))) {
 }
 
 my %edges = map { $_=>1} grep { $matches{$_} == 3 } keys %matches;
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%edges;
-
+my @corners;
 my $prod=1;
 while (my ($id,$data) = each %tiles) {
-    say $id;
     my $count =0 ;
     my %seen;
+    my $dir;
     foreach my $b (@$data) {
         next unless $matches{$b->{check}};
         next if $seen{$b->{check}}++;
-        $count++ if $matches{$b->{check}} == 3;
-        say $b->{check} ." " .$matches{$b->{check}};
+        if ($matches{$b->{check}} == 3) {
+            $count++;
+        }
     }
-    $prod*=$id if $count == 2;
-    say $count;
-
-# my @foo = grep { $edges{$_}} @$borders;
-#   $prod *= $id if (@foo == 2);
+    if ($count == 2) {
+        $prod*=$id;
+        push(@corners,$id);
+    }
 }
 say $prod;
-exit;
-my @corners = qw(1951 3079 1171 2971); # test
-#my @corners = qw(1609 1123 2621 3253); # prod
-
-#my $start = $corners[0];
-
-my %puzzle = ( 1_1 => [1951,0]);
 
 for my $start ($corners[0]) {
     say "\n\nST $start";
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper $tiles{$start};
     for my $cand ($tiles{$start}->@*) {
+        next unless $matches{$cand->{check}};
+        next if $matches{$cand->{check}} == 3;
         my $got = $by_edge{$cand->{check}};
         next unless $got;
         next if scalar keys %$got == 1;
