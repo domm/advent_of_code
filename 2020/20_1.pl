@@ -1,7 +1,6 @@
 use 5.020;
 use strict;
 use warnings;
-use Math::Matrix;
 
 my %tiles;
 my %matches;
@@ -17,46 +16,33 @@ for(split(/\n\n/,join('',<>))) {
         push(@tile,[split//]);
     }
 
-    my %seen;
-    for my $dir (0..3) {
-        calc($id,$dir,\@tile,\%seen);
+    my $top = checksum($tile[0]);
+    my $bottom = checksum($tile[9]);
+    my $left = checksum([ map { $tile[$_][0] } 0..9 ]);
+    my $right = checksum([ map { $tile[$_][9] } 0..9 ]);
 
-        my $m = Math::Matrix->new(@tile);
+    $matches{$top}++;
+    $matches{$bottom}++;
+    $matches{$left}++;
+    $matches{$right}++;
 
-        my $ud = $m->flipud;
-        calc($id,$dir.'_ud',$ud,\%seen);
-
-        my $lr = $m->fliplr;
-        calc($id,$dir.'_lr',$lr,\%seen);
-
-        my $n = $m->rot90();
-        @tile = @$n;
-    }
-
+    $tiles{$id}=[$top, $bottom, $left, $right];
 }
 
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%matches;
+my %edges = map { $_=>1} grep { $matches{$_} == 1 } keys %matches;
 
-#use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%tiles;
+use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%edges;
 
-
-sub calc {
-    my ($id,$dir,$tile, $seen) = @_;
-    my $checksum = checksum($tile);
-    return if $seen->{$checksum}++;
-    push($tiles{$id}->@*,{
-        check=>$checksum,
-        dir=>$dir,
-        #tile=>$tile,
-    });
-    push($matches{$checksum}->@*,[$id,$dir]);
+my @corners;
+while (my ($id,$borders) = each %tiles) {
+    say $id;
+    my @foo = grep { $edges{$_}} @$borders;
+    say scalar @foo;
 }
-
 
 sub checksum {
-    my $tile = shift;
-    my $row = join('',map { /#/ ? 1 : 0 } $tile->[0]->@*);
+    my $border = shift;
+    my $row = join('',map { /#/ ? 1 : 0 } $border->@*);
     return eval '0b'.$row;
 }
-
 
