@@ -27,9 +27,13 @@ for(split(/\n\n/,join('',<>))) {
     $tiles{$id} = \@sides;
 }
 
+
 my %edges = map { $_=>1} grep { $matches{$_} == 1 } keys %matches;
+use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%edges;
 my $prod=1;
 while (my ($id,$borders) = each %tiles) {
+    use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper $borders;
+
     my @foo = grep { $edges{$_}} @$borders;
     $prod *= $id if (@foo == 2);
 }
