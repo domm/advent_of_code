@@ -11,6 +11,9 @@ for (<>) {
     $bags{$container} = \@content;
 }
 
+use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%bags;
+
+
 say count_bag('shiny gold') - 1;
 
 sub count_bag {
