@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 my $id = shift @ARGV;
-my ($a, $b) = @ARGV;
 my @grid;
 
 my $max=0;
@@ -18,15 +17,13 @@ foreach my $x (1 .. 300) {
         $h //= 0;
         $h-=5;
         $grid[$x][$y] = $h;
-
-        #say "$x $y: $h";
+        #say $h;
         my $total = 0;
         foreach my $x1 (0 .. 2) {
             next if $x - $x1 < 1;
             foreach my $y1 (0 .. 2) {
                 next if $y - $y1 < 1;
                 $total += $grid[$x - $x1][$y - $y1];
-                #say "total $total";
             }
         };
         if ($total > $max) {
@@ -34,11 +31,6 @@ foreach my $x (1 .. 300) {
             $maxpos=($x -2) ." x ". ($y - 2);
         }
     }
+    #exit;
 }
-
-if ($a && $b) {
-    say $grid[$a][$b]{l}
-}
-
 say "$maxpos: $max";
-

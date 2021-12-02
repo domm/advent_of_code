@@ -1,32 +1,39 @@
 use 5.026;
 use strict;
-use warnings;
+#use warnings;
 
-my $width = 13;
-
-my $map = join('',<>);
-say $map;
-
+my $width = 0;
+my $map;
+while (<>) {
+    $map.=$_;
+    $width = length($_) if length($_) > $width;
+}
+$width--;
 my %carts;
 my $id = 'a';
 $map =~ s/([<>v\^])/my $d= $1; $carts{$id} = { dir=>$d, rot=>0, prev=> ($d=~\/[<>]\/ ? '-' : '|')};$id++/ge;
 
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%carts;
-
-my $tick = 0;
 my $carts = scalar keys %carts;
-#while ($map !~ /X/) {
-for (1 .. 50 ) {
+while ($map !~ /x/i) {
+    print `clear`;
     while ($map =~ /[a-z]/) {
-        $map=~s/([\\\/+\-\|])([a-z])/&left($2, $1)/e;
-        $map=~s/([a-z])([\\\/+\-\|])/&right($1, $2)/e;
-        $map=~s/([^\s])(.{13})([a-z])/&up($3, $1, $2)/es;
-        $map=~s/([a-z])(.{13})([^\s])/&down($1, $3, $2)/es;
+        $map=~s/([\\\/+\-A-Z])([a-z])/&left($2, $1)/e;
+        $map=~s/([a-z])([\\\/+\-A-Z])/&right($1, $2)/e;
+        $map=~s/([\\\/+\|A-Z])(.{$width})([a-z])/&up($3, $1, $2)/es;
+        $map=~s/([a-z])(.{$width})([\\\/+\|A-Z])/&down($1, $3, $2)/es;
     }
     $map=~s/([A-Z])/lc($1)/gse;
     say $map;
-    print `clear`; 
-    select(undef,undef,undef,0.2);
+    if ($map =~ /^(.*)x/is) {
+        my $l = length($1);
+        my $row = int($l / $width) ;
+        $map =~/\n([^\n]*?)x/is;
+        my $col = length($1);
+        say "$row / $col";
+        exit;
+    }
+
+    select(undef,undef,undef,0.5);
 }
 
 sub left {
@@ -39,6 +46,12 @@ sub left {
     }
     elsif ($next eq '/') {
         $carts{$cart}{dir} = 'v';
+    }
+    elsif ($next eq '+') {
+        turn($cart);
+    }
+    elsif ($next =~/[a-z]/i) {
+        return "X".$carts{$cart}{prev};
     }
 
     my $moved=uc($cart).$carts{$cart}{prev};
@@ -57,6 +70,12 @@ sub right {
     elsif ($next eq '/') {
         $carts{$cart}{dir} = '^';
     }
+    elsif ($next eq '+') {
+        turn($cart);
+    }
+    elsif ($next =~/[a-z]/i) {
+        return $carts{$cart}{prev}."X";
+    }
 
     my $moved=$carts{$cart}{prev}.uc($cart);
     $carts{$cart}{prev}=$next;
@@ -74,7 +93,12 @@ sub up {
     elsif ($next eq '/') {
         $carts{$cart}{dir} = '>';
     }
-
+    elsif ($next eq '+') {
+        turn($cart);
+    }
+    elsif ($next =~/[a-z]/i) {
+        return "X".$ignore.$carts{$cart}{prev};
+    }
 
     my $moved = uc($cart).$ignore.$carts{$cart}{prev};
     $carts{$cart}{prev}=$next;
@@ -92,8 +116,39 @@ sub down {
     elsif ($next eq '/') {
         $carts{$cart}{dir} = '<';
     }
+    elsif ($next eq '+') {
+        turn($cart);
+    }
+    elsif ($next =~/[a-z]/i) {
+        return $carts{$cart}{prev}.$ignore."X";
+    }
 
     my $moved = $carts{$cart}{prev}.$ignore.uc($cart);
     $carts{$cart}{prev}=$next;
     return $moved;
 }
+
+
+sub turn {
+    my $cart = shift;
+    my $cur = $carts{$cart}{dir};
+    my $turn = $carts{$cart}{rot} % 3;
+    my @dirs = qw(^ < v > ^ <);
+
+    if ($turn == 0) { # left
+        foreach my $i (1 .. 4) {
+            if ($cur eq $dirs[$i]) {
+                $carts{$cart}{dir}=$dirs[$i+1];
+            }
+        }
+    }
+    elsif ($turn == 2) { # right
+        foreach my $i (1 .. 4) {
+            if ($cur eq $dirs[$i]) {
+                $carts{$cart}{dir}=$dirs[$i-1];
+            }
+        }
+    }
+    $carts{$cart}{rot}++;
+}
+

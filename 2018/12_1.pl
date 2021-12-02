@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.026;
 use List::Util qw(min max);
-
+$|=1;
 my $gen = shift @ARGV;
 
 my $init = <>;
@@ -28,7 +28,7 @@ my $pots = \%pots;
 my $i=0;
 for (1 .. $gen ) {
     $pots = grow($pots);
-    say $i if $i++ % 100_000 == 0;
+    #say $i if $i++ % 100_000 == 0;
 }
 
 my $sum=0;
@@ -62,7 +62,7 @@ sub grow {
         }
     }
 
-    # foreach my $i (sort { $a <=> $b }  keys %next) {
+    ##foreach my $i (sort { $a <=> $b }  keys %next) {
     #     print $next{$i} if $next{$i} ;
     # }
     # print"\n";

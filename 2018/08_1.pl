@@ -11,6 +11,7 @@ while (@s) {
 sub parse {
     my $children = shift(@s);
     my $meta =shift(@s);
+    exit unless defined $children;
     for (1 .. $children) {
         parse();
     }
