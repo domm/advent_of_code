@@ -2,7 +2,7 @@ use 5.030;
 use strict;
 use warnings;
 
-my @diagnostics = map { [ split(//) ] } <>;
+my @diagnostics = map { chomp; [ split(//) ] } <>;
 
 say rating( 'oxygen', @diagnostics ) * rating( 'scrubber', @diagnostics );
 
@@ -25,6 +25,5 @@ sub rating {
         @list = $hit[$next]->@*;
         $pos++;
     }
-    my $val = '0b' . ( join( '', $list[0]->@* ) );
-    return eval $val;
+    return oct('0b' . ( join( '', $list[0]->@* ) ))
 }

@@ -19,5 +19,5 @@ for (@bits) {
     $γ.= $_ > $size ? 1 : 0;
     $ε.= $_ > $size ? 0 : 1;
 }
-say eval "$γ * $ε";
+say oct($γ) * oct($ε);
 
