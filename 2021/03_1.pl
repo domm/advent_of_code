@@ -1,6 +1,7 @@
 use 5.030;
 use strict;
 use warnings;
+use utf8;
 
 my @in = <>;
 my @bits;
@@ -13,10 +14,10 @@ for (@in) {
 }
 
 my $size = int(@in/2);
-my ($gamma, $epsilon)=('0b','0b');
+my ($γ, $ε)=('0b','0b');
 for (@bits) {
-    $gamma.= $_ > $size ? 1 : 0;
-    $epsilon.= $_ > $size ? 0 : 1;
+    $γ.= $_ > $size ? 1 : 0;
+    $ε.= $_ > $size ? 0 : 1;
 }
-say eval "$gamma * $epsilon";
+say eval "$γ * $ε";
 
