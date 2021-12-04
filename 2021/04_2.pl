@@ -25,15 +25,14 @@ for (<>) {
     $r++;
 }
 my $nope = shift @boards;
-    say scalar @boards;
 
 my $winners=0;
-DRAW: for my $drawn (@numbers) {
+for my $drawn (@numbers) {
     for (my $i=0;$i<@boards;$i++) {
         my $board = $boards[$i];
         next if $board eq 'winner';
         for my $line ($board->@*) {
-            if ($line->{$drawn}) {
+            if (exists $line->{$drawn}) {
                 $line->{$drawn} = 'X';
             }
 
@@ -41,21 +40,17 @@ DRAW: for my $drawn (@numbers) {
             if (@checked == 5) {
                 $boards[$i]='winner';
                 $winners++;
-                say "draw $drawn winners $winners";
-            
-                if ($winners == @boards) {
+say "winner $i";
+                #         if ($winners == @boards) {
                     my $sum;
                     for my $r (0..4) {
                         for my $n (keys $board->[$r]->%*) {
                             $sum+=$n unless $board->[$r]{$n} eq 'X';
                         }
                     }
-                    say $sum;
-                    say $drawn;
-                    say $sum * $drawn;
-                    exit;
-                }
-                #next DRAW;
+                    say "drawn $drawn, sum $sum, val ". $sum * $drawn;
+                    #   exit;
+                    #   }
             }
         }
     }
