@@ -25,7 +25,6 @@ for (<>) {
     $r++;
 }
 my $nope = shift @boards;
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@boards;
 
 for my $drawn (@numbers) {
     for my $board (@boards) {
@@ -33,11 +32,7 @@ for my $drawn (@numbers) {
             if ($line->{$drawn}) {
                 $line->{$drawn} = 'X';
             }
-        }
-    }
 
-    for my $board (@boards) {
-        for my $line ($board->@*) {
             my @checked = grep { /X/ } values $line->%*;
             if (@checked == 5) {
                 # WINNER!
@@ -50,11 +45,9 @@ for my $drawn (@numbers) {
                 say $sum;
                 say $drawn;
                 say $sum * $drawn;
-exit;
+                exit;
             }
         }
     }
-
 }
-
 
