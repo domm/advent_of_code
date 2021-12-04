@@ -2,27 +2,24 @@ use 5.030;
 use strict;
 use warnings;
 
-my @numbers = split( /,/, <> );
+my @in      = split( /\n\n/, join( '', <> ) );
+my @numbers = split( /,/,    shift(@in) );
 my @boards;
 
 my ( $b, $r ) = 0;
-for (<>) {
-    chomp;
-    if ( $_ !~ /\d/ ) { # newline, so start a new board
-        $b++;
-        $r = 0;
-        next;
+for ( my $b = 0; $b < @in; $b++ ) {
+    chomp( $in[$b] );
+    my @rows = split( /\n/, $in[$b] );
+    for ( my $r = 0; $r < @rows; $r++ ) {
+        $rows[$r] =~ s/^ //;
+        my @num = split( / +/, $rows[$r] );
+        for ( my $c = 0; $c < @num; $c++ ) {
+            my $val = $num[$c];
+            $boards[$b]->[$r]->{$val} = $val;
+            $boards[$b]->[ $c + @num ]->{$val} = $val;
+        }
     }
-    s/^ //;
-    my @num = split(/ +/);
-    for ( my $c = 0; $c < @num; $c++ ) {
-        my $val = $num[$c];
-        $boards[$b]->[$r]->{$val} = $val;
-        $boards[$b]->[ $c + @num ]->{$val} = $val;
-    }
-    $r++;
 }
-shift(@boards);
 
 my @results;
 
@@ -30,6 +27,7 @@ for my $drawn (@numbers) {
     for ( my $i = 0; $i < @boards; $i++ ) {
         my $board = $boards[$i];
         next if $board eq 'winner';
+
         for my $line ( $board->@* ) {
             if ( exists $line->{$drawn} ) {
                 $line->{$drawn} = 'X';
@@ -44,12 +42,12 @@ for my $drawn (@numbers) {
                         $sum += $n unless $board->[$r]{$n} eq 'X';
                     }
                 }
-                push(@results, $sum * $drawn);
+                push( @results, $sum * $drawn );
             }
         }
     }
 }
 
-say "part 1: ".$results[0];
-say "part 2: ".$results[-1];
+say "part 1: " . $results[0];
+say "part 2: " . $results[-1];
 
