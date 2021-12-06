@@ -8,22 +8,20 @@ for ( split( ',', <> ) ) {
 }
 
 for my $day ( 1 .. 256 ) {
-    my $born = 0;
+    my $born  = 0;
     my $total = 0;
-    for my $fish ( sort keys %fish ) {
-        my $count = $fish{$fish};
-        if ( $fish == 0 ) {
-            $born = $count;
-            $total += $count;
+    for my $gen ( sort keys %fish ) {
+        $total += $fish{$gen};
+        if ( $gen == 0 ) {
+            $born = $fish{$gen};
+            $total += $fish{$gen};
         }
         else {
-            $fish{ $fish - 1 } = $count;
-            $fish{$fish} = 0;
+            $fish{ $gen - 1 } = $fish{$gen};
+            $fish{$gen} = 0;
         }
-        $total += $count;
     }
-    $fish{6} += $born;
-    $fish{8} = $born;
+    $fish{6} += $fish{8} = $born;
     say "day $day: $total" if ( $day == 80 || $day == 256 );
 }
 
