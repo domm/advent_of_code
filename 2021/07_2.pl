@@ -13,9 +13,8 @@ my $lowest = 99999999999999999;
 for my $cand ( $low, $high ) {
     my $fuel;
     for my $c (@crabs) {
-        for my $s ( 0 .. abs( $c - $cand ) ) {
-            $fuel += $s;
-        }
+        my $diff = abs( $c - $cand );
+        $fuel += $diff * ( $diff + 1 ) / 2;
     }
     $lowest = $fuel if $fuel < $lowest;
 }
