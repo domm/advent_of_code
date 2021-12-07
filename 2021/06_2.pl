@@ -1,27 +1,22 @@
 use 5.030;
 use strict;
 use warnings;
+use List::Util qw(sum);
 
-my %fish = map { $_ => 0 } ( 0 .. 8 );
-for ( split( ',', <> ) ) {
-    $fish{ int $_ }++;
-}
+my @fish = map { 0 } ( 0 .. 8 );
+$fish[ $_ ]++ for ( split( ',', <> ) );
 
 for my $day ( 1 .. 256 ) {
-    my $born  = 0;
-    my $total = 0;
-    for my $gen ( sort keys %fish ) {
-        $total += $fish{$gen};
+    my $born = 0;
+    for my $gen ( 0 .. 8 ) {
         if ( $gen == 0 ) {
-            $born = $fish{$gen};
-            $total += $fish{$gen};
+            $born = $fish[$gen];
         }
         else {
-            $fish{ $gen - 1 } = $fish{$gen};
-            $fish{$gen} = 0;
+            $fish[ $gen - 1 ] = $fish[$gen];
         }
     }
-    $fish{6} += $fish{8} = $born;
-    say "day $day: $total" if ( $day == 80 || $day == 256 );
+    $fish[6] += $fish[8] = $born;
+    say "$day: ".sum(@fish) if ( $day == 80 || $day == 256 );
 }
 
