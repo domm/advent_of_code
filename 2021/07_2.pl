@@ -4,18 +4,20 @@ use warnings;
 
 use Statistics::Basic qw(:all);
 
-my @crabs  = sort { $a <=> $b } map { int } split( ',', <> );
+my @crabs = split( ',', <> );
+my $mean  = mean(@crabs);
+my $low   = int($mean);
+my $high  = sprintf( '%.0f', $mean );
 
 my $lowest = 99999999999999999;
-for my $cand ($crabs[0] .. $crabs[-1]) {
+for my $cand ( $low, $high ) {
     my $fuel;
     for my $c (@crabs) {
-        for my $s (0 .. abs( $c - $cand )) {
-            $fuel+=$s;
+        for my $s ( 0 .. abs( $c - $cand ) ) {
+            $fuel += $s;
         }
     }
     $lowest = $fuel if $fuel < $lowest;
-    say $cand if $cand % 100 == 0;
 }
 
 say $lowest;
