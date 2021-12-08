@@ -52,29 +52,23 @@ for (<>) {
             }
         }
     }
-    while (@sixes) {
-        my $cand = shift(@sixes);
+    for my $cand (@sixes) {
         my $lc6 = List::Compare->new([keys %$cand], $res[1]);
         my @intersection = $lc6->get_intersection;
-        my $hit;
         if (@intersection == 1) {
             $res[6] = [ keys %$cand ];
-            $hit=1;
         }
         else {
             my $lc9 = List::Compare->new([keys %$cand], $res[4]);
-            my @intersection = $lc9->get_intersection;
-            if (@intersection == 4) {
+            my $lc0 = List::Compare->new([keys %$cand], $res[4]);
+            my @intersection_9_4 = $lc9->get_intersection;
+            my @intersection_0_4 = $lc0->get_intersection;
+            if (@intersection_9_4 == 4) {
                 $res[9] = [ keys %$cand ];
-                $hit=1;
             }
-        }
-        if (@sixes == 1) {
-            my $zero = shift (@sixes);
-            $res[0] = [ keys %$zero ];
-        }
-        elsif (!$hit) {
-            push(@sixes,$cand);
+            elsif (@intersection_0_4 == 3) {
+                $res[0] = [ keys %$cand ];
+            }
         }
     }
 
@@ -86,7 +80,7 @@ for (<>) {
     my $output;
     for my $read (split/ /,$second) {
         my $lookup = join('',sort split(//,$read));
-        say "$lookup ". $decode{$lookup};
+        #say "$lookup ". $decode{$lookup};
         $output.=$decode{$lookup};
     }
     say $output;
