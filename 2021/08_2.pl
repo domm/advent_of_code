@@ -10,6 +10,7 @@ my %direct=(
     7 => 8,
 );
 
+my $sum;
 for (<>) {
     chomp;
     my ($first,$second)=split/ \| /;
@@ -77,7 +78,18 @@ for (<>) {
         }
     }
 
+    my %decode;
+    for (my $i = 0; $i<@res;$i++) {
+        $decode{join('',sort $res[$i]->@*)} = $i;
+    }
 
-
+    my $output;
+    for my $read (split/ /,$second) {
+        my $lookup = join('',sort split(//,$read));
+        say "$lookup ". $decode{$lookup};
+        $output.=$decode{$lookup};
+    }
+    say $output;
+    $sum+=$output;
 }
-say $hit;
+say $sum;
