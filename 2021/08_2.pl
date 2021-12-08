@@ -30,8 +30,7 @@ for (<>) {
         }
         else { die "ARGH $l $read" }
     }
-    while (@fives) {
-        my $cand = shift(@fives);
+    for my $cand (@fives) {
         # if contains both of 1 its a 3
         if ($cand->{$res[1][0]} && $cand->{$res[1][1]}) {
             $res[3] = [ keys %$cand ];
@@ -42,13 +41,8 @@ for (<>) {
             if (@intersection == 3) {
                 $res[5] = [ keys %$cand ];
             }
-
-            if (@fives == 1) {
-                my $two = shift (@fives);
-                $res[2] = [ keys %$two ];
-            }
             else {
-                push(@fives,$cand);
+                $res[2] = [ keys %$cand ];
             }
         }
     }
@@ -80,7 +74,6 @@ for (<>) {
     my $output;
     for my $read (split/ /,$second) {
         my $lookup = join('',sort split(//,$read));
-        #say "$lookup ". $decode{$lookup};
         $output.=$decode{$lookup};
     }
     say $output;
