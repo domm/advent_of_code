@@ -5,11 +5,10 @@ use warnings;
 my $hit;
 for (<>) {
     chomp;
-    my ($first,$second)=split/ \| /;
-    for my $read (split/ /,$second) {
+    my ( $first, $second ) = split / \| /;
+    for my $read ( split / /, $second ) {
         my $l = length($read);
-        $hit++ if ($l ==2 || $l == 3 || $l ==4 || $l ==7);
+        $hit++ if ( $l == 2 || $l == 3 || $l == 4 || $l == 7 );
     }
-
 }
 say $hit;
