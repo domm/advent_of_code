@@ -40,32 +40,37 @@ for (my $r=0;$r<@map;$r++) {
     }
 }
 
-say $sum;
-
-__END__
+my @sizes;
 foreach my $sink (keys %hits) {
-    my $size;
+    my $hit = {};
     my ($r,$c)=split(/:/,$sink);
-
-    walk($r, $c);
-
+    walk($r, $c, $hit, 1);
+    my $size = scalar keys %$hit;
+    push(@sizes,$size);
 }
+
+my @sort = sort { $b<=>$a} @sizes;
+say $sort[0] *  $sort[1] * $sort[2];
+
 
 sub walk {
-    my ($r, $c,  ) = @_;
+    my ($r, $c, $hit, $l ) = @_;
+    my $val = $map[$r]->[$c];
+    #say "$l look at $r/$c : ".($val || 'x');
+    return if !defined $val || $val == 9 || $val == -1;
+    $hit->{"$r:$c"}++;
+    $map[$r]->[$c] = -1;
+
     for my $move ([-1,0],[1,0],[0,-1],[0,1]) {
-        my $val = $map[$r + $move->[0]]->[$c + $move->[1]];
-        say ($r + $move->[0])." ".($c + $move->[1]).": $val";
-
-        
-
+        my $r2 = $r + $move->[0];
+        my $c2 = $c + $move->[1];
+        if ($r2<0 || $c2<0) {
+            next;
+        }
+        walk($r2,$c2, $hit, $l+1);
     }
-    
-
 
 }
 
-
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%hits;
 
 
