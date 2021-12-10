@@ -2,11 +2,17 @@ use 5.030;
 use strict;
 use warnings;
 
-my %open = (
+my %map = (
     '(' => ')',
     '[' => ']',
     '{' => '}',
     '<' => '>',
+);
+my %score = (
+    ')' => 3,
+    ']' => 57,
+    '}' => 1197,
+    '>' => 25137,
 );
 
 my %hits;
@@ -14,12 +20,12 @@ LINE: for my $line (<>) {
     chomp($line);
     my @stack;
     for my $c ( split( //, $line ) ) {
-        if ( $open{$c} ) {
+        if ( $map{$c} ) {
             push( @stack, $c );
         }
         else {
             my $last = pop(@stack);
-            if ( $c ne $open{$last} ) {
+            if ( $c ne $map{$last} ) {
                 $hits{$c}++;
                 next LINE;
             }
@@ -27,16 +33,9 @@ LINE: for my $line (<>) {
     }
 }
 
-my %points = (
-    ')' => 3,
-    ']' => 57,
-    '}' => 1197,
-    '>' => 25137,
-);
-
-my $res = 0;
+my $points = 0;
 while ( my ( $char, $count ) = each %hits ) {
-    $res += $points{$char} * $count;
+    $points += $score{$char} * $count;
 }
-say $res;
+say $points;
 

@@ -2,7 +2,7 @@ use 5.030;
 use strict;
 use warnings;
 
-my %open = (
+my %map = (
     '(' => ')',
     '[' => ']',
     '{' => '}',
@@ -20,18 +20,18 @@ LINE: for my $line (<>) {
     chomp($line);
     my @stack;
     for my $c ( split( //, $line ) ) {
-        if ( $open{$c} ) {
+        if ( $map{$c} ) {
             push( @stack, $c );
         }
         else {
             my $last = pop(@stack);
-            next LINE if ( $c ne $open{$last} );
+            next LINE if ( $c ne $map{$last} );
         }
     }
     my $points = 0;
     for my $c ( reverse @stack ) {
         $points *= 5;
-        $points += $score{ $open{$c} };
+        $points += $score{ $map{$c} };
     }
     push( @points, $points );
 }
