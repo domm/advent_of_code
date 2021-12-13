@@ -18,7 +18,7 @@ for ( split( /\n/, $map ) ) {
 # pad the map
 for my $r ( 0 .. $max_r ) {
     for my $c ( 0 .. $max_c ) {
-        $map[$r][$c] ||= '░';
+        $map[$r][$c] ||= ' ';
     }
 }
 
