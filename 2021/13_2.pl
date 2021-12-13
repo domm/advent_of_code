@@ -27,7 +27,7 @@ for my $line ( split( /\n/, $folds ) ) {
         my $at = $1;
         splice( @map, $at, 1 );
         my @low = splice( @map, $at, @map - $at );
-        push( @low, [ map {'░'} ( 0 .. $max_c ) ] ) if @low != @map;    # danger!
+        push( @low, [ map {' '} ( 0 .. $max_c ) ] ) if @low != @map;    # danger!
         my $r = 0;
         for my $folded ( reverse @low ) {
             my $c = 0;
