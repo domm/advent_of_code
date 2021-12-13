@@ -25,14 +25,13 @@ for my $r ( 0 .. $max_r ) {
 for my $line ( split( /\n/, $folds ) ) {
     if ( $line =~ /y=(\d+)/ ) {
         my $at = $1;
-        splice( @map, $at, 1 );
-        my @low = splice( @map, $at, @map - $at );
-        push( @low, [ map {' '} ( 0 .. $max_c ) ] ) if @low != @map;    # danger!
-        my $r = 0;
+        splice( @map, $at, 1 );                       # remove the fold
+        my @low = splice( @map, $at, @map - $at );    # fold it
+        my $r   = @map - @low;                        # make sure the fold aligns
         for my $folded ( reverse @low ) {
             my $c = 0;
             for my $mark (@$folded) {
-                $map[$r][$c] = $mark if $mark eq '█';
+                $map[$r][$c] = $mark if $mark eq '█';    # rub through
                 $c++;
             }
             $r++;
@@ -42,23 +41,21 @@ for my $line ( split( /\n/, $folds ) ) {
         my $at = $1;
         my $r  = 0;
         for my $row (@map) {
-            splice( @$row, $at, 1 );
-            my @right = splice( @$row, $at, @$row - $at );
-            my $c     = 0;
+            splice( @$row, $at, 1 );                          # remove the fold
+            my @right = splice( @$row, $at, @$row - $at );    # fold it
+            my $c     = @$row - @right;                       # make sure the fold aligns
             for my $mark ( reverse @right ) {
-                $map[$r][$c] = $mark if $mark eq '█';
+                $map[$r][$c] = $mark if $mark eq '█';         # rub through
                 $c++;
             }
             $r++;
         }
-
     }
 }
-draw( \@map );
+draw();
 
 sub draw {
-    my $m = shift;
-    for my $r (@$m) {
+    for my $r (@map) {
         say join( '', @$r );
     }
 }
