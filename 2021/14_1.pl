@@ -2,8 +2,9 @@ use 5.030;
 use strict;
 use warnings;
 
-my $template = <>;<>;
-chomp($template);
+my @poly = split(//,<>);<>;
+pop(@poly);
+
 my %rules;
 for (<>) {
     chomp;
@@ -12,8 +13,6 @@ for (<>) {
     $rules{$pair}=[$split[0],$insert];
 }
 
-my $step=1;
-my @poly = split(//,$template);
 for my $step (1 .. 10) {
     my @new;
     for (my $i=0;$i<@poly-1;$i++) {
