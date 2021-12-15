@@ -2,6 +2,8 @@ use 5.030;
 use strict;
 use warnings;
 
+use Heap::Simple;
+
 my @map;
 for (<>) {
     chomp;
@@ -21,7 +23,6 @@ for (my $r = 0;$r<@map;$r++) {
     }
 }
 
-
 @map = @nmap;
 $size = @map - 1;
 my %nodes;
@@ -39,11 +40,13 @@ for (my $r=0;$r<=$size;$r++) {
 
 my $target = "$size:$size";
 my %visited = ('0:0' => 0);
-my @todo = ['0:0', {}];
-my $i = 0;
-while (@todo) {
-    my $n = shift(@todo);
-    my ($node, $seen) = @$n;
+
+my $todo = Heap::Simple->new(order => "<", elements => [Array => 0]);
+$todo->insert([$visited{'0:0'}, '0:0',{}]);
+
+while ( $todo->count) {
+    my $n = $todo->extract_top;
+    my ($foo, $node, $seen) = @$n;
     next if $seen->{$node}++;
 
     my $this_cost = $visited{$node};
@@ -57,11 +60,8 @@ while (@todo) {
         elsif (!defined $visited{$loc}) {
             $visited{$loc} = $check_cost;
         }
-        push(@todo,[$loc, $seen]);
+        $todo->insert([$visited{$loc}, $loc, $seen]);
     }
-    @todo = sort { $visited{$a->[0]} <=>  $visited{$b->[0]} } @todo;
-    $i++;
-    say $i if $i % 1000 == 0;
 }
 
 say $visited{$target};
