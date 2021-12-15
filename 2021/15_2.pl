@@ -46,7 +46,10 @@ while (@todo) {
     next if $seen->{$node}++;
 
     my $this_cost = $visited{$node};
-    for my $next ($nodes{$node}->@*) {
+
+    my @nexts = sort { $a->[1] <=> $b->[1]} $nodes{$node}->@*;
+    my @unsorted;
+    for my $next (@nexts) {
         my ($loc, $node_cost) = @$next;
         next if $seen->{$loc};
         my $check_cost = $this_cost + $node_cost;
@@ -56,10 +59,12 @@ while (@todo) {
         elsif (!defined $visited{$loc}) {
             $visited{$loc} = $check_cost;
         }
-        push(@todo,[$loc, $seen]);
+        say $loc." : ".$visited{$loc};
+        push(@unsorted,[$loc, $seen]);
     }
+    my @sorted = sort { $visited{$a->[0]} <=>  $visited{$b->[0]} } @unsorted;
+    push(@todo,@sorted);
 }
 
 say $visited{$target};
-
 

@@ -33,7 +33,7 @@ while (@todo) {
     for my $next ($nodes{$node}->@*) {
         my ($loc, $node_cost) = @$next;
         next if $seen->{$loc};
-        my $check_cost =  $this_cost + $node_cost;
+        my $check_cost = $this_cost + $node_cost;
         if (defined $visited{$loc} && $visited{$loc} >  $check_cost ) {
             $visited{$loc} = $check_cost;
         }
