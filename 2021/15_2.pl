@@ -7,7 +7,23 @@ for (<>) {
     chomp;
     push(@map,[split(//,$_)]);
 }
-my $size = @map - 1;
+my $size = @map ;
+my @nmap;
+for (my $r = 0;$r<@map;$r++) {
+    for (my $c = 0;$c<@map;$c++) {
+        for my $er (0 .. 4) {
+            for my $ec (0 .. 4) {
+                my $val = $map[$r][$c] + $er + $ec;
+                $val = $val - 9 if $val > 9;
+                $nmap[$r + ($size*$er)][ $c + ($size*$ec)] = $val;
+            }
+        }
+    }
+}
+
+
+@map = @nmap;
+$size = @map - 1;
 my %nodes;
 for (my $r=0;$r<=$size;$r++) {
     for (my $c=0;$c<=$size;$c++) {
@@ -33,7 +49,7 @@ while (@todo) {
     for my $next ($nodes{$node}->@*) {
         my ($loc, $node_cost) = @$next;
         next if $seen->{$loc};
-        my $check_cost =  $this_cost + $node_cost;
+        my $check_cost = $this_cost + $node_cost;
         if (defined $visited{$loc} && $visited{$loc} >  $check_cost ) {
             $visited{$loc} = $check_cost;
         }
@@ -45,4 +61,5 @@ while (@todo) {
 }
 
 say $visited{$target};
+
 
