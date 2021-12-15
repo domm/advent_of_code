@@ -30,7 +30,7 @@ while ( $todo->count ) {
         my $lr  = $r + $look->[0];
         my $lc  = $c + $look->[1];
         my $loc = "$lr:$lc";
-        $lr < 0 || $lc < 0 || $lr > $border || $lc > $border;
+        next if $lr < 0 || $lc < 0 || $lr > $border || $lc > $border;
         my $cost = $visited{"$r:$c"} + $map[$lr][$lc];
         if ( !defined $visited{$loc} || $visited{$loc} > $cost ) {
             $visited{$loc} = $cost;
