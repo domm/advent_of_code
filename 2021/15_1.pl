@@ -28,34 +28,35 @@ for (my $r=0;$r<=$size;$r++) {
 my $start = "0:0";
 my $target = "$size:$size";
 
-my %costs = ('0:0' => 0);
+my %visited = ('0:0' => 0);
 my @todo = [$start, {}];
 
 while (@todo) {
     my $n = shift(@todo);
     my ($node, $seen) = @$n;
     next if $seen->{$node}++;
-    say $node;
+    say "$node cost: ".$visited{$node} if $node eq '2:2';
     if ($node eq $target) {
         say "AT TARGTE";
-        use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%costs;
-
-        exit;
+        last;
     }
 
-    my $this_cost = $costs{$node};
+    my $this_cost = $visited{$node};
     for my $next ($nodes{$node}->@*) {
         my ($loc, $node_cost) = @$next;
         next if $seen->{$loc};
         my $check_cost =  $this_cost + $node_cost;
-        if (defined $costs{$loc} && $costs{$loc} > $check_cost ) {
-            $costs{$loc} = $check_cost;
+        say "   $loc: $this_cost + $node_cost = $check_cost " if $loc eq '2:2';#.  $costs{$loc};
+        if (defined $visited{$loc} && $visited{$loc} >  $check_cost ) {
+            $visited{$loc} = $check_cost;
         }
-        else {
-            $costs{$loc} = $check_cost;
+        elsif (!defined $visited{$loc}) {
+            $visited{$loc} = $check_cost;
         }
 
         push(@todo,[$loc, $seen]);
     }
 }
+
+say $visited{$target};
 
