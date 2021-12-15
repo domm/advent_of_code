@@ -25,29 +25,37 @@ for (my $r=0;$r<=$size;$r++) {
     }
 }
 
+my $start = "0:0";
 my $target = "$size:$size";
-say $target;
-for (1..10) {
-    my %seen;
-    my $cost=0;
-    say walk('0:0', $cost, \%seen);
-}
 
-sub walk($node, $cost, $seen) {
-    $seen->{$node}=1;
-    say "$node - $cost";
+my %costs = ('0:0' => 0);
+my @todo = [$start, {}];
+
+while (@todo) {
+    my $n = shift(@todo);
+    my ($node, $seen) = @$n;
+    next if $seen->{$node}++;
+    say $node;
     if ($node eq $target) {
-        use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper $seen;
+        say "AT TARGTE";
+        use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%costs;
 
-        say "foud $cost";
         exit;
     }
 
-    foreach my $next ( $nodes{$node}->@* ) {
-        next if $seen->{$next->[0]};
-        printf("next  %s, cost %s\n",@$next);
-        $cost += $next->[1];
-        walk( $next->[0], $cost, $seen );
+    my $this_cost = $costs{$node};
+    for my $next ($nodes{$node}->@*) {
+        my ($loc, $node_cost) = @$next;
+        next if $seen->{$loc};
+        my $check_cost =  $this_cost + $node_cost;
+        if (defined $costs{$loc} && $costs{$loc} > $check_cost ) {
+            $costs{$loc} = $check_cost;
+        }
+        else {
+            $costs{$loc} = $check_cost;
+        }
+
+        push(@todo,[$loc, $seen]);
     }
 }
 
