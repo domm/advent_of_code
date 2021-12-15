@@ -24,20 +24,18 @@ my $todo = Heap::Simple->new( order => "<", elements => [ Array => 0 ] );
 $todo->insert( [ 0, 0, 0, {} ] );
 my $border  = $#map;
 my %visited = ( '0:0' => 0 );
-my %seen;
 while ( $todo->count ) {
     my ( undef, $r, $c ) = $todo->extract_top->@*;
-    next if $seen{"$r:$c"}++;
     for my $look ( [ -1, 0 ], [ 1, 0 ], [ 0, -1 ], [ 0, 1 ] ) {
         my $lr  = $r + $look->[0];
         my $lc  = $c + $look->[1];
         my $loc = "$lr:$lc";
-        next if $seen{$loc} || $lr < 0 || $lc < 0 || $lr > $border || $lc > $border;
+        $lr < 0 || $lc < 0 || $lr > $border || $lc > $border;
         my $cost = $visited{"$r:$c"} + $map[$lr][$lc];
         if ( !defined $visited{$loc} || $visited{$loc} > $cost ) {
             $visited{$loc} = $cost;
+            $todo->insert( [ $visited{$loc}, $lr, $lc ] );
         }
-        $todo->insert( [ $visited{$loc}, $lr, $lc ] );
     }
 }
 say $visited{"$border:$border"};
