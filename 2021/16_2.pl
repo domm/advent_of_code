@@ -9,10 +9,8 @@ my $bits = join('',map { sprintf("%.4b", hex('0x'.$_)) } @hex);
 my $version_sum=0;
 my @total;
 parse($bits,0,\@total);
-say "vers suym $version_sum";
-
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@total;
-
+say "part 1: $version_sum";
+say "part 2: ".$total[0];
 
 sub parse {
     my ($bits, $number, $vals) = @_;
@@ -24,7 +22,6 @@ sub parse {
         my $version = oct('0b'.substr($bits,0,3,''));
         my $type_id = oct('0b'.substr($bits,0,3,''));
         $hit++;
-        say "version $version type_id $type_id";
         $version_sum+=$version;
         if ($type_id  == 4) {
             my $acc;
@@ -68,9 +65,8 @@ sub parse {
             elsif ($type_id == 7) {
                $res = $childvals[0] == $childvals[1] ? 1 : 0;
             }
-            
             push(@$vals,$res);
         }
     }
-    return $bits; 
+    return $bits;
 }
