@@ -21,21 +21,21 @@ $max=$r + 1;
 
 my @look = ([-1,-1],[-1,0],[-1,1],[0,-1],[0,0],[0,1],[1,-1],[1,0],[1,1]);
 
-for my $step (1 .. 2) {
+my @background=($algo[0],$algo[-1]);
+for my $step (1 .. 50) {
     my %enhanced;
-    for my $r ($min  .. $max) {
+    for my $r ($min .. $max) {
         for my $c ($min .. $max) {
             my $bits;
             for my $l (@look) {
                 my $look = $map{join(':',$r+$l->[0],$c+$l->[1])};
+                if (!defined $look) {
+                    $look = $background[$step % 2];
+                }
                 $bits .= $look ? 1 : 0;
             }
             my $new =  $algo[oct('0b'.$bits)];
             $enhanced{"$r:$c"} = $new;
-            # say oct('0b'.$bits);
-            # say $algo[oct('0b'.$bits)] ;
-            # say $enhanced{"$r:$c"};
-            # exit;
         }
     }
     %map = %enhanced;
@@ -46,7 +46,7 @@ for my $step (1 .. 2) {
     for (values %map) {
         $lit++ if $_ == 1;
     }
-    say "$step LIT $lit";
+    say "$step: $lit" if $step eq 2 || $step eq 50;
 }
 
 
