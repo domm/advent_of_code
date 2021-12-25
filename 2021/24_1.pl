@@ -2,61 +2,34 @@ use 5.030;
 use strict;
 use warnings;
 
-my @prog = map { chomp; [ split/ / ] } <>;
+# https://github.com/dphilipson/advent-of-code-2021/blob/master/src/days/day24.rs
 
-#my $mnr = 99999999999999;
-my $mnr = 99999996883287;
+my @progs;
+my $i = 0;
+for (<>) {
+    chomp;
+    my @line = split / /;
+    $i++ if $line[0] eq 'inp';
+    push($progs[$i]->@*,\@line);
+}
 
-my $cnt=0;
-while (1) {
-    $mnr--;
-    next if $mnr =~ /0/;
-    if ($cnt++ > 100_000) {
-        say $mnr;
-        $cnt=0;
+my @stack;
+my @rules;
+for my $i (1..14) {
+    my $prog = $progs[$i];
+    my $check = $prog->[5]->[2];
+    my $offset = $prog->[15]->[2];
+    if ($check > 0) {
+        push(@stack,[$i,$offset]);
     }
-    my @data=split(//,$mnr);
-    my $result = run(@data);
-    if ($result->{z} == 0) {
-        say "found $mnr";
+    else {
+        my $old = pop(@stack);
+        my $calc = $old->[1] + $check;
+        push(@rules, ("[$i] = [".$old->[0]. "] ".($calc>0?'+':'-')." ".abs($calc)));
     }
 }
 
-sub run {
-    my ( @input ) =@_;
+say "and now manually solve the val of each pos:";
 
-    my %var = (w=>0,x=>0,y=>0,z=>0);
-    for my $statement (@prog) {
-        my ($op, $a, $b ) = $statement->@*;
-
-        if ($op eq 'inp') {
-            $var{$a} = shift(@input);
-            next;
-        }
-        $var{a} //= 0;
-        if ($b =~/[wxyz]/) {
-            $b = $var{$b} // 0;
-        }
-        #        say "call $op with $a, $b";
-        if ($op eq 'add') {
-            $var{$a} += $b;
-        }
-        elsif ($op eq 'mul') {
-            $var{$a} *= $b;
-        }
-        elsif ($op eq 'div') {
-            $var{$a} = int($var{$a}/$b);
-        }
-        elsif ($op eq 'mod') {
-            $var{$a} = $var{$a} % $b;
-        }
-        elsif ($op eq 'eql') {
-            $var{$a} = 1 if $var{$a} == $b;
-        }
-        else {
-            die "invalid op $op";
-        }
-    }
-    return \%var;
-}
+use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@rules;
 
