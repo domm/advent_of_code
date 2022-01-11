@@ -10,44 +10,46 @@ my $step=0;
 while (1) {
     $step++;
     my @next;
+    my $move=0;
     # move left herd
     while (my ($r, $row) = each @map) {
         while (my ($c, $val) = each @$row) {
             my $look = ($c + 1) % $width;
-            #say "at $c, look at $look: ".$val.$map[$r][$look];
-            if ($val eq '>' && $map[$r][$look] eq '.') {
-                $next[$r][$look] = $val;
-                $next[$r][$c] = '.';
+            # say "at $c, look at $look: ".$val.$map[$r][$look];
+            if ($val eq '>') {
+                if ($map[$r][$look] eq '.') {
+                    $next[$r][$look] = $val;
+                    $next[$r][$c] = '.';
+                    $move++;
+                }
             }
-            else {
-                $next[$r][$c] = $val if !$next[$r][$c] || $next[$r][$c] eq '.';
-            }
+            $next[$r][$c] ||= $val;
         }
     }
+    @map = @next;
+    my @next2;
     # move down herd
     while (my ($r, $row) = each @map) {
         while (my ($c, $val) = each @$row) {
             my $look = ($r + 1) % $height;
             #say "down: at $r/$c, look at $look/$c: ".$val.$map[$look][$c];
-            if ($val eq 'v' && $map[$look][$c] eq '.') {
-                $next[$look][$c] = $val;
-                $next[$r][$c] = '.';
+            if ($val eq 'v') {
+                if  ($map[$look][$c] eq '.') {
+                    $next2[$look][$c] = $val;
+                    $next2[$r][$c] = '.';
+                    $move++;
+                }
             }
-            else {
-                $next[$r][$c] = $val if !$next[$r][$c] || $next[$r][$c] eq '.';
-            }
+            $next2[$r][$c] ||= $val;
         }
     }
 
     say $step;
-    for my $row (@next) {
-        for my $col (@$row) {
-            print $col;
-        }
-        print "\n";
+    @map = @next2;
+    if ($move == 0 ) {
+        say "No movement on step $step";
+        exit;
     }
-    @map = @next;
-exit if $step == 2;
 }
 
 
