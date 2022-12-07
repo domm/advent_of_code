@@ -2,23 +2,14 @@ use 5.030;
 use strict;
 use warnings;
 
-my @cmds = map {chomp; $_} <>;
 my %sizes;
 my @cwd;
-
-for (my $i=0;$i<@cmds;$i++) {
-    my $cmd = $cmds[$i];
+while (my $cmd = <>) {
     if ($cmd eq '$ cd ..') {
         pop(@cwd);
     }
     elsif ($cmd =~ / cd (.*)$/) {
-        my $dir = $1;
-        push(@cwd,$dir);
-    }
-    elsif ($cmd eq '$ ls') { # noop
-    }
-    elsif ($cmd =~ /dir (.*)/) {
-        my $name = $1;
+        push(@cwd,$1);
     }
     elsif ($cmd=~/^(\d+) (.*)/) {
         my ($size, $name) = ($1, $2);
@@ -28,6 +19,7 @@ for (my $i=0;$i<@cmds;$i++) {
             pop(@parent);
         }
     }
+    # other data can be ignored
 }
 
 my $disk = 70000000;
