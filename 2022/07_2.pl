@@ -15,27 +15,17 @@ for (my $i=0;$i<@cmds;$i++) {
         my $dir = $1;
         push(@cwd,$dir);
     }
-    elsif ($cmd eq '$ ls') {
-        LS: while (1) {
-            $i++;
-            my $ls = $cmds[$i];
-            last unless $ls;
-
-            if ($ls =~ /dir (.*)/) {
-                my $name = $1;
-            }
-            elsif ($ls=~/^(\d+) (.*)/) {
-                my ($size, $name) = ($1, $2);
-                my @parent = @cwd;
-                while (@parent) {
-                    $sizes{join('/',@parent)}+=$size;
-                    pop(@parent);
-                }
-            }
-            else {
-                $i--;
-                last LS;
-            }
+    elsif ($cmd eq '$ ls') { # noop
+    }
+    elsif ($cmd =~ /dir (.*)/) {
+        my $name = $1;
+    }
+    elsif ($cmd=~/^(\d+) (.*)/) {
+        my ($size, $name) = ($1, $2);
+        my @parent = @cwd;
+        while (@parent) {
+            $sizes{join('/',@parent)}+=$size;
+            pop(@parent);
         }
     }
 }
