@@ -22,14 +22,12 @@ sub between {
 }
 
 sub draw {
-    my $p = ($c % 40 )-1;
-    if ($p >= $x-1 && $p <= $x+1) {
+    my $p = $c % 40;
+    if ($p >= $x && $p <= $x+2) {
         print '█';
     }
     else {
         print " ";
     }
-    if ($c % 40==0) {
-       print "\n";
-   }
+    print "\n" if $p == 0;
 }

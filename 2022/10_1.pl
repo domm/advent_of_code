@@ -13,7 +13,6 @@ while (my $in = <>) {
         between();
     }
 }
-
 say $sum;
 
 sub between {
@@ -26,9 +25,7 @@ sub between {
 
 sub check {
     if ($c % 40==20) {
-        my $signal = $c * $x;
-        say "in $c  \t SIG $signal";
-        $sum+=$signal
+        $sum += $c * $x;
     }
 }
 
