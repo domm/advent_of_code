@@ -15,15 +15,14 @@ for my $line (@lines) {
     }
     elsif ($line =~ /Starting items: (.*)/) {
         my @items = split(/, /,$1);
-        say join('-',@items);
         $monkeys{$current}{items} = \@items;
     }
     elsif ($line =~ /Op.*: (.*)/) {
         my $op = $1;
-        $op =~s /(\w+)/'$'.$1/eg;
+        $op =~s /(new|old)/'$'.$1/eg;
         $monkeys{$current}{op} = $op;
     }
-    elsif ($line =~ /divis.*(\d+)/) {
+    elsif ($line =~ /divis.*?(\d+)$/) {
         $monkeys{$current}{test} = $1;
     }
     elsif ($line =~ /true.*(\d+)/) {
@@ -33,9 +32,27 @@ for my $line (@lines) {
         $monkeys{$current}{false} = $1;
     }
 }
+my $max = (scalar keys %monkeys )-1;
 
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%monkeys;
+for my $round (1 .. 20) {
+    for my $m ( 0 .. $max) {
+        my $op = $monkeys{$m}->{op};
+        while (my $old = shift ($monkeys{$m}->{items}->@*)) {
+            $monkeys{$m}->{inspect}++;
+            my $new;
+            eval $monkeys{$m}->{op};
+            $new = int($new / 3);
+            if ($new % $monkeys{$m}->{test} == 0) {
+                push($monkeys{$monkeys{$m}->{true}}->{items}->@*,$new);
+            }
+            else {
+                push($monkeys{$monkeys{$m}->{false}}->{items}->@*,$new);
+            }
+        }
+    }
+}
 
+my @inspections = sort {$b <=> $a } map { $_->{inspect} } values %monkeys;
 
-
+say $inspections[0] * $inspections[1];
 
