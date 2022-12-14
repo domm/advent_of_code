@@ -1,13 +1,14 @@
 use v5.36;
 
 my $map={};
-$map->{0}{500} = 's';
+my $max_r = 0;
 for (<>) {
     chomp;
     my @lines;
     for (split (/ -> /)) {
         my ($col, $row) = split(/,/);
         push(@lines, [$row, $col]);
+        $max_r = $row if $row > $max_r;
     }
     for (my $i = 0;$i<$#lines;$i++) {
         my $start = $lines[$i];
@@ -26,16 +27,33 @@ for (<>) {
         }
     }
 }
+$max_r++;
 
-
-
-
-sub draw {} {
-for my $r (0..9) {
-    print $r;
-    for my $c (490 .. 510) {
-        print $map->{$r}{$c} || ' ';
+my $sand_at_rest = 0;
+my $prev_sand = -1;
+while (1) {
+    my $r =0; my $c = 500;
+    ROW: while ($r < $max_r) {
+        if (!$map->{$r}{$c}) { # trickle down
+            $r++;
+            next ROW;
+        }
+        for my $dc (0,-1,1) { # spread out
+            my $lc = $c + $dc;
+            if (!$map->{$r}{$lc}) {
+                $r++;
+                $c = $lc;
+                next ROW;
+            }
+        }
+        $map->{$r-1}{$c} = '.';
+        $sand_at_rest++;
+        last ROW;
     }
-    print "\n";
+    if ($sand_at_rest == $prev_sand) {
+        last;
+    }
+    $prev_sand = $sand_at_rest;
 }
-}
+
+say $sand_at_rest;
