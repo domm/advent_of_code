@@ -1,26 +1,30 @@
 use v5.36;
+use List::MoreUtils qw(lower_bound upper_bound);
 
+my $y = 2000000;
 my %map;
+my @x;
+my @sensors;
+
 while (<>) {
     my ($sx, $sy, $bx, $by) = /=(-?\d+).*=(-?\d+).*=(-?\d+).*=(-?\d+)/;
     my $d = abs($sx - $bx) + abs($sy - $by);
-    say "$sx $sy -> $bx $by = $d";
-    $map{$sy}{$sx}='S';
     $map{$by}{$bx}='B';
-    my @topleft=($sx-$d,$sy-$d);
-    my @bottomright=($sx+$d, $sy+$d);
-    #say "\t ".join(':',@topleft).' - '.join(':',@bottomright);
-    for my $tx ($sx - $d .. $sx + $d) {
-        for my $ty ($sy - $d .. $sy + $d) {
-            #say "tr $tx:$ty";
-            if (abs($sx - $tx) + abs($sy - $ty) <= $d) {
-                $map{$ty}{$tx}||='#';
-            }
-        }
-
-    }
+    push(@x,$sx - $d, $sx + $d);
+    push(@sensors,[$sx,$sy, $d]);
 }
 
-say scalar grep { /#/ } values $map{10}->%*;
-
-
+@x = sort { $a<=>$b } @x;
+say $x[0].' ' .$x[-1];
+my $inside;
+for my $x ($x[0] -5  .. $x[-1] + 5) {
+    say $x if $x % 250_000 == 0;
+    for my $s (@sensors) {
+        if (abs($x - $s->[0]) + abs($y - $s->[1]) <= $s->[2]) {
+            $inside++;
+            last;
+        }
+    }
+}
+my $b = scalar values $map{$y}->%*;
+say $inside - $b;
