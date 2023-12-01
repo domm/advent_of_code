@@ -13,6 +13,12 @@ my %replace = (
     eight=>8,
     nine=>9,
 );
+
+# better: https://www.reddit.com/r/adventofcode/comments/1883ibu/comment/kbj2stu/
+#   "one": "o1e",
+#   "two": "t2o",
+#   "three": "t3e",
+
 my $matcher = join('|',keys %replace);
 
 my $sum;
