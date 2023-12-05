@@ -18,22 +18,17 @@ for my $def (@blocks) {
 
 my $lowest=999999999999999999999;
 
-for my $seed (@seeds) {
+for my $val (@seeds) {
     for my $map (@maps) {
-        my $next = $seed;
         MAP: for my $entry ($map->@*) {
-            if ($entry->[0] <= $seed <= $entry->[1]) {
-                #        say "mapped $seed";
-                my $offset = $seed - $entry->[0];
-                $next = $entry->[2] + $offset;
+            if ($entry->[0] <= $val <= $entry->[1]) {
+                my $offset = $val - $entry->[0];
+                $val = $entry->[2] + $offset;
                 last MAP;
             }
         }
-        # say "next: $next";
-        $seed = $next;
     }
-    $lowest = $seed if $seed < $lowest;
+    $lowest = $val if $val < $lowest;
 }
 
 say $lowest;
-
