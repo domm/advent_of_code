@@ -3,8 +3,12 @@ use strict;
 use warnings;
 use List::Util qw(min max);
 
+my $debug = 0;
 my @blocks = split(/\n\n/,join('',<>));
+
 my %seeds = grep { /^\d+$/ } split(/\s+/,shift @blocks);
+my @ranges = map { { start=>$_, stop => $_ + $seeds{$_} - 1  } } keys %seeds; ;
+
 my @maps;
 for my $def (@blocks) {
     my @def = split(/\n/,$def);
@@ -12,62 +16,42 @@ for my $def (@blocks) {
     my @map;
     for my $line (@def) {
         my ($dest_start, $source_start, $length) = split(/\s+/, $line);
-        push(@map, { map_start => $source_start, map_stop => $source_start + $length -1, dest_start => $dest_start, dest_stop =>$dest_start + $length -1, length=>$length });
+        push(@map, { start => $source_start, stop => $source_start + $length -1, dest_start => $dest_start, dest_stop =>$dest_start + $length -1 });
     }
     push(@maps, \@map);
 }
-my $lowest=999999999999999999999;
 
-my @ranges;
-for my $seed_start (sort keys %seeds) {
-    my $seed_length = $seeds{$seed_start};
-    say "$seed_start -> $seed_length";
-
-    push (@ranges,{ check_start => $seed_start, check_stop => $seed_start + $seed_length - 1, length=>$seed_length });
-}
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@ranges;
-my $c=1;
 for my $map (@maps) {
-    say "in MAP ".$c++;
-    my @nextnext;
+    my @next_set;
     for my $entry ($map->@*) {
-        my @next;
-        while (@ranges) {
-            my $check = shift @ranges;
-            printf("check overlap of check %i-%i with map %i->%i \n", $check->{check_start},$check->{check_stop}, $entry->{map_start},$entry->{map_stop});
-            if (($check->{check_stop} < $entry->{map_start}) || ($check->{check_start} > $entry->{map_stop})) {
-                say "\tbefore/after this map";
-                push(@next, $check);
+        my @next_entry;
+        for my $check (@ranges) {
+            printf("check overlap of check %i-%i with mapentry %i->%i \n", $check->{start},$check->{stop}, $entry->{start},$entry->{stop}) if $debug;
+            if (($check->{stop} < $entry->{start}) || ($check->{start} > $entry->{stop})) {
+                say "\tbefore/after this map, so pass to next entry" if $debug;
+                push(@next_entry, $check);
             }
-            elsif ($check->{check_stop} >= $entry->{map_start} || $check->{check_start} <= $entry->{map_stop}) {
-                say "\toverlap with map, split and pass to next map";
-                if ($check->{check_start} < $entry->{map_start}) {
-                    say "\t\tchop of before to check further with this map: ".sprintf("%i-%i",$check->{check_start},$entry->{map_start}-1 );
-                    push(@ranges, {check_start=>$check->{check_start}, check_stop=>$entry->{map_start}-1});
+            elsif ($check->{stop} >= $entry->{start} || $check->{start} <= $entry->{stop}) {
+                say "\toverlap with map, split and pass to next map" if $debug;
+                if ($check->{start} < $entry->{start}) {
+                    say "\t\tchop of before to check further with this map: ".sprintf("%i-%i",$check->{start},$entry->{start}-1 ) if $debug;
+                    push(@next_entry, {start=>$check->{start}, stop=>$entry->{start}-1});
                 }
-                if ($check->{check_stop} > $entry->{map_stop}) {
-                    say "\t\tchop of after to check further with this map: ".sprintf("%i-%i",$check->{map_stop}+1, check_stop=>$entry->{check_stop});
-                    push(@ranges, {check_start=>$check->{map_stop}+1, check_stop=>$entry->{check_stop}});
+                if ($check->{stop} > $entry->{stop}) {
+                    say "\t\tchop of after to check further with this map: ".sprintf("%i-%i",$entry->{stop}+1, $check->{stop}) if $debug;
+                    push(@next_entry, {start=>$entry->{stop}+1, stop=>$check->{stop}});
                 }
-                my $overlap_start = max($check->{check_start}, $entry->{map_start});
-                my $overlap_stop = min($check->{check_stop}, $entry->{map_stop});
-                my $offset = $entry->{dest_start} - $entry->{map_start};
-                say "\t\toverlap $overlap_start $overlap_stop  offset $offset";
+                my $overlap_start = max($check->{start}, $entry->{start});
+                my $overlap_stop = min($check->{stop}, $entry->{stop});
+                my $offset = $entry->{dest_start} - $entry->{start};
+                say "\t\toverlap $overlap_start $overlap_stop offset $offset" if $debug;
 
-                push(@nextnext, {check_start => $overlap_start + $offset, check_stop=>$overlap_stop + $offset});
-                @ranges=();
+                push(@next_set, {start => $overlap_start + $offset, stop=>$overlap_stop + $offset});
             }
         }
-        push(@ranges,@next);
-    use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@ranges;
+        @ranges = @next_entry;
     }
-    push(@ranges,@nextnext);
-    use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@ranges;
+    push(@ranges, @next_set);
 }
 
-    use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \@ranges;
-for (@ranges) {
-     $lowest = $_->{check_start} if $_->{check_start} < $lowest;
-}
-
-say $lowest;
+say min(map { $_->{start} } @ranges);
