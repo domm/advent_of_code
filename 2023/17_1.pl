@@ -2,6 +2,7 @@ use 5.030;
 use strict;
 use warnings;
 use Heap::Simple; # for Dijkstra
+use List::Util qw(any);
 
 my %map;
 my $r=1;
@@ -18,23 +19,47 @@ $r--;
 my $start = "1:1";
 my $end = "$r:$r";
 
+my @move = ([ -1, 0, 'N','S' ], [ 1, 0, 'S','N' ], [ 0, -1, 'W','E'], [ 0, 1, 'E','W' ]);
+
 my $todo = Heap::Simple->new( order => "<", elements => [ Array => 0 ] );
-$todo->insert( [ 0, split(/:/,$start), {} ] );
+$todo->insert( [ 0, split(/:/,$start), []] );
 my %visited = ( $start => 0 );
+my %paths;
 while ( $todo->count ) {
-    my ( undef, $r, $c ) = $todo->extract_top->@*;
-    for my $look ( [ -1, 0 ], [ 1, 0 ], [ 0, -1 ], [ 0, 1 ] ) {
+    my ( $curcost, $r, $c, $path ) = $todo->extract_top->@*;
+
+    for my $look ( @move ) {
         my $lr  = $r + $look->[0];
         my $lc  = $c + $look->[1];
         my $target = "$lr:$lc";
-        next unless $map{$target};
+        next unless $map{$target}; # don't move off the map
+        my $dir = $path->[-1] || 'x';
+        next if $look->[3] eq $dir; # don't turn straight back
 
-        # TODO: max three straigt steps
-        my $cost = $visited{"$r:$c"} + $map{$target};
-        if ( !defined $visited{$target} || $visited{$target} > $cost ) {
-            $visited{$target} = $cost;
-            $todo->insert( [ $visited{$target}, $lr, $lc ] );
+        if (@$path >= 3) { # don't continue after three straight steps
+            my $last_three = join('',@$path[-3],@$path[-2],@$path[-1]);
+            if ($last_three =~ /(NNN|SSS|EEE|WWW)$/) {
+                next if $path->[-1] eq $look->[2];
+            };
+        }
+        say "at $r:$c = $curcost check $target ".join('',@$path);
+
+        my $ldir = $look->[2];
+        my $cost = $visited{"$r:$c:$dir"} + $map{$target};
+        if ( !defined $visited{$target.':'.$ldir} || $visited{$target.':'.$ldir} > $cost ) {
+
+            $visited{$target.':'.$ldir} = $cost;
+            my @path = @$path;
+            push(@path, $ldir);
+            $todo->insert( [ $cost, $lr, $lc, \@path] );
+            $paths{$target.':'.$ldir} = \@path;
         }
     }
 }
-say $visited{$end};
+
+use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%visited;
+
+say  $visited{$end.':S'};
+say  $visited{$end.':E'};
+say join('',@{$paths{$end.':S'}});
+say join('',@{$paths{$end.':E'}});
