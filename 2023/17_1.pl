@@ -2,7 +2,7 @@ use 5.030;
 use strict;
 use warnings;
 use Heap::Simple; # for Dijkstra
-use List::Util qw(any);
+use List::Util qw(min);
 
 my %map;
 my $r=1;
@@ -17,16 +17,22 @@ for my $row (<>) {
 }
 $r--;
 my $start = "1:1";
-my $end = "$r:$r";
+my $stop = $r;
+my @end;
 
 my @move = ([ -1, 0, 'N','S' ], [ 1, 0, 'S','N' ], [ 0, -1, 'W','E'], [ 0, 1, 'E','W' ]);
 
+
+# this might be helpful: https://github.com/scorixear/AdventOfCode/blob/main/2023/17/1.py
+
 my $todo = Heap::Simple->new( order => "<", elements => [ Array => 0 ] );
-$todo->insert( [ 0, split(/:/,$start), []] );
+$todo->insert( [ 0, split(/:/,$start), [], 1] );
 my %visited = ( $start => 0 );
 my %paths;
 while ( $todo->count ) {
-    my ( $curcost, $r, $c, $path ) = $todo->extract_top->@*;
+    my ( $curcost, $r, $c, $path, $step ) = $todo->extract_top->@*;
+
+    push(@end,$curcost) if ($r == $stop && $c == $stop);
 
     for my $look ( @move ) {
         my $lr  = $r + $look->[0];
@@ -36,30 +42,23 @@ while ( $todo->count ) {
         my $dir = $path->[-1] || 'x';
         next if $look->[3] eq $dir; # don't turn straight back
 
-        if (@$path >= 3) { # don't continue after three straight steps
-            my $last_three = join('',@$path[-3],@$path[-2],@$path[-1]);
-            if ($last_three =~ /(NNN|SSS|EEE|WWW)$/) {
-                next if $path->[-1] eq $look->[2];
-            };
-        }
-        say "at $r:$c = $curcost check $target ".join('',@$path);
+        #say "at $r:$c = $curcost check $target ".join('',@$path);
 
         my $ldir = $look->[2];
-        my $cost = $visited{"$r:$c:$dir"} + $map{$target};
-        if ( !defined $visited{$target.':'.$ldir} || $visited{$target.':'.$ldir} > $cost ) {
 
-            $visited{$target.':'.$ldir} = $cost;
+        my $lstep = $ldir eq $dir ? $step+1 : 1;
+        next if $lstep > 3;
+
+        my $cost = ($visited{"$r:$c:$dir:$step"} || 0) + $map{$target};
+        if ( !defined $visited{"$target:$ldir:$lstep"} || $visited{"$target:$ldir:$lstep"} > $cost ) {
+            $visited{"$target:$ldir:$lstep"} = $cost;
             my @path = @$path;
             push(@path, $ldir);
-            $todo->insert( [ $cost, $lr, $lc, \@path] );
+            $todo->insert( [ $cost, $lr, $lc, \@path, $lstep] );
             $paths{$target.':'.$ldir} = \@path;
         }
     }
 }
 
-use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper \%visited;
+say min(@end);
 
-say  $visited{$end.':S'};
-say  $visited{$end.':E'};
-say join('',@{$paths{$end.':S'}});
-say join('',@{$paths{$end.':E'}});
