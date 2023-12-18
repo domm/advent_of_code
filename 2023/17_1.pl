@@ -22,9 +22,6 @@ my @end;
 
 my @move = ([ -1, 0, 'N','S' ], [ 1, 0, 'S','N' ], [ 0, -1, 'W','E'], [ 0, 1, 'E','W' ]);
 
-
-# this might be helpful: https://github.com/scorixear/AdventOfCode/blob/main/2023/17/1.py
-
 my $todo = Heap::Simple->new( order => "<", elements => [ Array => 0 ] );
 $todo->insert( [ 0, split(/:/,$start), [], 1] );
 my %visited = ( $start => 0 );
@@ -32,7 +29,10 @@ my %paths;
 while ( $todo->count ) {
     my ( $curcost, $r, $c, $path, $step ) = $todo->extract_top->@*;
 
-    push(@end,$curcost) if ($r == $stop && $c == $stop);
+    if ($r == $stop && $c == $stop) {
+        say $curcost;
+        exit;
+    }
 
     for my $look ( @move ) {
         my $lr  = $r + $look->[0];
