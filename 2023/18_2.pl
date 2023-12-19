@@ -2,6 +2,8 @@ use 5.030;
 use strict;
 use warnings;
 
+# math!! https://arachnoid.com/area_irregular_polygon/index.html
+
 
 my $r = 0;
 my $c = 0;
