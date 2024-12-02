@@ -11,6 +11,6 @@ while ( my $line = <> ) {
 @l = sort @l;
 my $score=0;
 for my $l (@l) {
-    $score += ($l * $r{$l});
+    $score += ($l * $r{$l}) if $r{$l};
 }
 say $score;
