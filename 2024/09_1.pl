@@ -6,35 +6,39 @@ pop(@map); # remove trainling newline
 
 my $id = 0;
 my $pos = 0;
+my %frees;
 my @frees;
 my @files;
 for my ($file, $space) (@map) {
     for (0 .. $file -1 ) {
         $files[$pos++] = $id;
     }
-    for (0 .. $space -1 ) {
-        $files[$pos] = '.';
-        $frees[$pos++] = 1;
+    if ($space) {
+        for (0 .. $space -1 ) {
+            push(@frees, $pos);
+            $pos++;
+        }
     }
     $id++;
 }
-my $max_id =$id - 1;
-say $max_id;
 
-my $defrag = join('', @files);
-$defrag.='.';
-say $defrag;
+my $defrag;
 
-while ($defrag =~ /\d\.\d/) {
-    $defrag =~s /^(\d+)\.(.*)(\d)\./$1$3$2./;
-    say $defrag;
-
+while (@frees) {
+    my $val = pop(@files);
+    next if !defined $val;
+    my $next_free = shift(@frees);
+    $files[$next_free] = $val;
+    $defrag = join('', map { $_ // '.' } @files);
+    last if $defrag !~ /\d\.\d/ ;
+    #last if $next_free + 1 >= @files;
+    #last if $defrag =~ /^\d+$/;
 }
-
-my $checksum;
-my @check = split(//,$defrag);
-for (my $i = 0;$i<@check;$i++) {
-    last if $check[$i] eq '.';
-    $checksum+= $i * $check[$i];
+$defrag = join('', map { $_ // '.' } @files);
+my $checksum=0;
+for (my $i = 0;$i<@files;$i++) {
+    next if (! defined $files[$i]) || $files[$i] eq '.';
+    $checksum+= $i * $files[$i];
 }
 say $checksum;
+
