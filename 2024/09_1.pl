@@ -4,24 +4,24 @@ use v5.40;
 my @map = split(//,<>);
 pop(@map); # remove trainling newline
 
-my %disk;
 my $id = 0;
+my $pos = 0;
+my @frees;
+my @files;
 for my ($file, $space) (@map) {
-    $disk{$id} = {
-        file => $file,
-        free => $space || 0,
-    };
+    for (0 .. $file -1 ) {
+        $files[$pos++] = $id;
+    }
+    for (0 .. $space -1 ) {
+        $files[$pos] = '.';
+        $frees[$pos++] = 1;
+    }
     $id++;
 }
 my $max_id =$id - 1;
 say $max_id;
 
-
-my $defrag='';
-for my $id (0 .. $max_id) {
-    $defrag.= $id x $disk{$id}->{file};
-    $defrag.= '.' x $disk{$id}->{free};
-}
+my $defrag = join('', @files);
 $defrag.='.';
 say $defrag;
 
