@@ -26,7 +26,7 @@ for my ($r, $row) (indexed @map) {
             $map[$r+1][$c] = '|' if $map[$r+1][$c] eq '.';
         }
     }
-    last if $r == @map -1;
+    last if $r == @map -2;
 }
 
 say "splits $split";
