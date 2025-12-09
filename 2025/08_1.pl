@@ -14,66 +14,46 @@ while (my $p = $iter->next) {
 my @by_dist = sort { $dists{$a} <=> $dists{$b} } keys %dists;
 
 my %circuits;
-my %c2;
 my $cid=1;
-for (1 .. 1000) {
+my $loop = @coords > 30 ? 1000 : 10;
+for (1 .. $loop) {
     my $shortest = shift(@by_dist);
     my @boxes = split(/:/,$shortest);
     my $ca = $circuits{$boxes[0]};
     my $cb = $circuits{$boxes[1]};
 
-    print "connect $shortest" ;# if ($cid == 66 || $cid == 84);;
+    printf("connect $shortest a %s b %s", $ca || 'no', $cb || 'no') if $loop == 10;
 
     if ($ca && !$cb) {
-        print "\t".$boxes[0]." is in cir c$ca, other is not" ;#if ($cid == 66 || $cid == 84);
+        print "\t".$boxes[0]." is in cir c$ca, other is not" if $loop == 10;
         $circuits{$boxes[1]} = $ca;
-        push($c2{$ca}->@*, $boxes[1]);
     }
     elsif (!$ca && $cb) {
-        print "\t".$boxes[1]." is in cir c$cb, other is not" ;# if ($cid == 66 || $cid == 84);
+        print "\t".$boxes[1]." is in cir c$cb, other is not" if $loop == 10;
         $circuits{$boxes[0]} = $cb;
-        push($c2{$cb}->@*, $boxes[0]);
     }
     elsif ($ca && $cb && $ca != $cb) {
-        print "\tconnect two existing circuits c$ca and c$cb"; # if ($cid == 66 || $cid == 84);
-
-    if ($ca == 13 && $cb == 11) {
-        say "problem";
-        say join(' ',@boxes);
-        use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;say Dumper $c2{$boxes[0]};
-        use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;say Dumper $c2{$boxes[1]};
-    }
-
-        $circuits{$boxes[0]} = $circuits{$boxes[1]} = $ca;
-        push($c2{$ca}->@*, $c2{$cb}->@*);
-        for my $a ($c2{$ca}->@*) {
-            say "set $a to $ca";
-            $circuits{$a} = $ca;
-        }
-        for my $b ($c2{$cb}->@*) {
-            say "set $b to $ca";
+        print "\tconnect two existing circuits c$ca and c$cb" if $loop == 10;
+        # rewire
+        for my $b (boxes_of_circuit($cb)) {
             $circuits{$b} = $ca;
         }
-        delete $c2{$cb};
     }
-    else {
-        print "\tnew circuit c$cid";# if ($cid == 66 || $cid == 84);
+    elsif (!$ca && !$cb) {
+        print "\tnew circuit c$cid" if $loop == 10;
         $circuits{$boxes[0]} = $circuits{$boxes[1]} = $cid;
-        push($c2{$cid}->@*, @boxes);
         $cid++;
     }
-    print "\n";
+    print "\n" if $loop == 10;
 }
 
 my %count;
 while (my ($i, $c) = each %circuits) {
     $count{$c}++;
 }
-
 my @size = sort { $b <=> $a} values %count;
 
 say $size[0] * $size[1] * $size[2];
-
 
 sub distance ($f, $t) {
     ($f->{x} - $t->{x})**2 + 
@@ -81,4 +61,10 @@ sub distance ($f, $t) {
     ($f->{z} - $t->{z})**2
 }
 
-
+sub boxes_of_circuit ($cid) {
+    my @boxes;
+    while (my ($i, $c) = each %circuits) {
+        push(@boxes, $i) if $c == $cid;
+    }
+    return @boxes
+}
