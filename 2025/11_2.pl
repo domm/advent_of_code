@@ -11,21 +11,24 @@ while (my $l = <>) {
     $graph{$this}= \@children;
 }
 
-my $paths=0;
-my $path;
-walk('svr', $path);
+my $path='';
 
-say $paths;
+# there is no route from dac to fft!
+say walk('svr','fft', $path)
+  * walk('fft','dac', $path)
+  * walk('dac','out', $path);
 
-sub walk($node, $path) {
-    $path.="$node,";
-    if ($node eq 'out') {
-        $paths++ if $path =~ /fft/ && $path =~ /dac/;
+sub walk($node, $target, $path, $mem = {}) {
+    if ($node eq $target) {
+        return 1;
     }
-    else {
-        for my $child ($graph{$node}->@*) {
-            walk($child, $path);
-        }
+    elsif (defined $mem->{$node}) {
+        return $mem->{$node};
     }
+    $path.=$node.',';
+    for my $child ($graph{$node}->@*) {
+        $mem->{$node} += walk($child, $target, $path, $mem);
+    }
+    return $mem->{$node} // 0;
 }
 
